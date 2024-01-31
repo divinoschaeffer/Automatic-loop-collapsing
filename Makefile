@@ -1,6 +1,7 @@
 CC = gcc
+ROOTDIR = $(shell pwd)
 
-CFLAGS  = -g -Wall -I/mnt/c/Users/23544/Documents/Uni/m2/TER/Automatic-loop-collapsing/clan/include -L/mnt/c/Users/23544/Documents/Uni/m2/TER/Automatic-loop-collapsing/clan -I/mnt/c/Users/23544/Documents/Uni/m2/TER/Automatic-loop-collapsing/clan/include
+CFLAGS  = -g -Wall -I$(ROOTDIR)/clan/include -L$(ROOTDIR)/clan -I$(ROOTDIR)/clan/osl/include -L$(ROOTDIR)/clan/osl
 OUTPUT_DIR = .dist
 TARGET = collapse
 
