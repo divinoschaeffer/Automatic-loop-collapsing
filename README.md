@@ -1,1 +1,1 @@
-# Automatic-loop-flattening
+# Automatic-loop-collapsing
