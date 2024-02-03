@@ -41,7 +41,11 @@ enum TCD_NextStep
      * @brief Next step is to build the collapsed source using Cloog after we have
      * updated the former polyedral reprensation adding the newly generated paths.
      */
-    TCD_BUILD_COLLAPSED
+    TCD_BUILD_COLLAPSED,
+    /**
+     * @brief End of the collapsing process.
+     */
+    TCD_END
 };
 
 /**
