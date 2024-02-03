@@ -1,1 +1,10 @@
 .dist
+y.tab.*
+*.yy.c
+Dom2Cond
+FloorCeilExtract
+Frac2Floor
+Maxima2Cfloat
+Maxima2Cint
+Maxima2MPC
+Pourcent2Mod
