@@ -1,0 +1,29 @@
+======================================================================
+                             REQUIREMENTS
+======================================================================
+
+Before installing,  please make sure  that you have  already installed
+the following packages:
+
+  * bison
+  * libbison-dev
+  * build-essential
+  * flex
+  * libgmp-dev
+  * libmpc-dev
+  * maxima
+  
+  
+Additionally, install:
+  * NTL 11.1.0 available here: https://shoup.net/ntl
+  * barvinok (the latest release) available here: 
+             https://repo.or.cz/barvinok.git
+
+======================================================================
+                               BUILD
+======================================================================
+
+$make
+
+Binaries of the textual converters used in TRAHRHE are generated.
+

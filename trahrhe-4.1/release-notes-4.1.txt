@@ -1,0 +1,4 @@
+# trahrhe 4.1 - 23 November 2023
+
+- removed useless computations when dichotomy search is selected for the trahrhe functions inside the generated header file
+
