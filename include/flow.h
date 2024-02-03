@@ -88,6 +88,23 @@ typedef struct
 TCD_Flow *tcdFlow;
 
 /**
+ * @brief Inits the Tcd_Flow structure
+ */
+void initTcdFlow();
+
+/**
+ * @brief Destruct the Tcd_Flow and frees all memories spaces linked to it.
+ */
+void endTcdFlow();
+
+/**
+ * @brief Moves the flow to the next step.
+ * @details Performs some checks to make sure the current step is coherent.
+ * @return int 0 if succefull - other integer if not
+ */
+int tcdGoToNextStep();
+
+/**
  * At some point, we may want to transit our data structure through terminal scripts.
  * In this purpose, it is interesting to have the following functions.
  */
