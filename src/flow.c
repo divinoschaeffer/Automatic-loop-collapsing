@@ -8,18 +8,22 @@
 
 #include "flow.h"
 
-extern TCD_Flow *tcdFlow;
+/**
+ * @brief TCD_Flow is global - all C sources that use it must declare it as extern.
+ */
+TCD_Flow *tcdFlow;
 
-void initTdcFlow(void)
+void initTcdFlow(char* inputFilename, char* outputFilename)
 {
+    tcdFlow = (TCD_Flow *)malloc(sizeof(TCD_Flow));
     tcdFlow->stepIndex = TCD_REWRITE_TRAHRHE_COLLAPSE;
     tcdFlow->flowData = (TCD_FlowData *)malloc(sizeof(TCD_FlowData));
-    tcdFlow->flowData->entryFile.vanilla = NULL;
-    tcdFlow->flowData->outputFile = NULL;
+    tcdFlow->flowData->entryFile.vanilla = inputFilename;
+    tcdFlow->flowData->outputFile = outputFilename;
     tcdFlow->flowData->scop = NULL;
 }
 
-void endTdcFlow(void)
+void endTcdFlow(void)
 {
     free(tcdFlow->flowData);
     free(tcdFlow);
@@ -35,8 +39,14 @@ int tcdGoToNextStep(void)
     return -1;
 }
 
-void exportTcdFlow(char *fileName) {
+void tcdPrintStep(void) {
+    printf("---------------\n");
+    printf("TCD:: Step:: %d\n", tcdFlow->stepIndex);
+    printf("---------------\n");
 }
 
-void importTcdFlow(char *fileName) {
+void exportTcdFlow(char *filename) {
+}
+
+void importTcdFlow(char *filename) {
 }

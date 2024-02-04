@@ -6,6 +6,9 @@
  * @date 2024-02-03
  */
 
+#ifndef __FLOW_H
+#define __FLOW_H
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -15,7 +18,7 @@
  * @brief Indexes that define the next step of the collapsing process.
  * Starts at @param TCD_REWRITE_TRAHRHE_COLLAPSE (0).
  */
-enum TCD_NextStep
+typedef enum
 {
     /**
      * @brief Next step is to rewrite the #pragma trharhe collapse(N) directive into a
@@ -46,7 +49,7 @@ enum TCD_NextStep
      * @brief End of the collapsing process.
      */
     TCD_END
-};
+} TCD_NextStep;
 
 /**
  * @brief Computational data to be transported during the collapsing
@@ -58,14 +61,14 @@ typedef struct
      */
     union
     {
-        FILE vanilla;
-        FILE scoped;
+        char *vanilla;
+        char *scoped;
     } entryFile;
 
     /**
      * @brief Output file.
      */
-    FILE outputFile;
+    char *outputFile;
 
     /**
      * @brief Pointer on the current polyedral representation of the source code.
@@ -87,14 +90,9 @@ typedef struct
 } TCD_Flow;
 
 /**
- * @brief TCD_Flow is global - all C sources that use it must declare it as extern.
- */
-TCD_Flow *tcdFlow;
-
-/**
  * @brief Inits the Tcd_Flow structure
  */
-void initTcdFlow();
+void initTcdFlow(char* inputFilename, char* outputFilename);
 
 /**
  * @brief Destruct the Tcd_Flow and frees all memories spaces linked to it.
@@ -109,20 +107,27 @@ void endTcdFlow();
 int tcdGoToNextStep();
 
 /**
+ * @brief Prints the next step
+ */
+void tcdPrintStep();
+
+/**
  * At some point, we may want to transit our data structure through terminal scripts.
  * In this purpose, it is interesting to have the following functions.
  */
 
 /**
  * @brief Writes a JSON representing the current structure of the collapsing flow.
- * @param fileName the name of the flow's JSON file to generate.
+ * @param filename the name of the flow's JSON file to generate.
  */
-void exportTcdFlow(char *fileName);
+void exportTcdFlow(char *filename);
 
 /**
  * @brief Reads a JSON representing the a collapsing flow and loads it in the
  * current states.
  * @note This operation overrides the current flow it there is one.
- * @param fileName the name of the flow's JSON file.
+ * @param filename the name of the flow's JSON file.
  */
-void importTcdFlow(char *fileName);
+void importTcdFlow(char *filename);
+
+#endif
