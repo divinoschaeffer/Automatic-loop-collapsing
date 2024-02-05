@@ -1,6 +1,6 @@
 #include "data.h"
 
-extern TCD_Flow *tcdFlow;
+extern TCD_FlowData *tcdFlowData;
 
 char **domain_strings(osl_relation_p domain, osl_names_t* names) {
     char** strings;
@@ -59,7 +59,7 @@ TCD_Boundary getBoundary(osl_relation_p domain) {
     
     int variableCount = domain->nb_output_dims;
 
-    osl_names_t *strings = osl_scop_names(tcdFlow->flowData->scop);
+    osl_names_t *strings = osl_scop_names(tcdFlowData->scop);
     char **iteratorStrings = domain_strings(domain, strings);
     printf("Variable count: %d\n", variableCount);
 
@@ -79,12 +79,11 @@ TCD_Boundary getBoundary(osl_relation_p domain) {
     return boundary;
 }
 
-
 TCD_Boundary getBoundaries() {
     TCD_Boundary boundaryHead = (TCD_Boundary)malloc(sizeof(struct Boundary));
     TCD_Boundary currentBoundary = boundaryHead;
 
-    osl_scop_p scopP = tcdFlow->flowData->scop;
+    osl_scop_p scopP = tcdFlowData->scop;
     
     if (!scopP) return NULL;
 
