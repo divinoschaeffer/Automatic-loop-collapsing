@@ -3,8 +3,8 @@
 extern TCD_Flow *tcdFlow;
 
 void cliMiddleware(int argc, char** argv) {
-    if (argc < 2) {
-        fprintf(stderr, "Usage: <collapse> <inputFilename> [<outputFilename>]\n");
+    if (2 < argc && argc < 3) {
+        fprintf(stderr, "Usage: <collapse> <inputFilename> [-o <outputFilename>]\n");
         exit(EXIT_FAILURE);
     }
 }
@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
 
     /* Initialize */
     char *inputFilename = argv[1];
-    char *outputFilename = argc > 2 ? argv[2] : "out.c";
+    char *outputFilename = argc > 3 ? argv[3] : "out.c";
     initTcdFlow(inputFilename, outputFilename);
     
     tcdGoToNextStep(); // TODO: for now, we consider we have passed the first step.
@@ -33,6 +33,8 @@ int main(int argc, char** argv) {
     scop = clan_scop_extract(entryFile, options);
     printf("Language: %s\n", scop->language);
 
+    tcdFlow->flowData->scop = scop;
+
     #pragma endregion
 
     tcdGoToNextStep();
@@ -42,7 +44,8 @@ int main(int argc, char** argv) {
     /* Step 2: Extract loops terminals */
     tcdPrintStep();
 
-    
+    // TCD_Boundary boundaries = 
+    getBoundaries();
 
     #pragma endregion
 

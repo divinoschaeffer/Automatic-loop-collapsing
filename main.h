@@ -6,5 +6,6 @@
 #include <clan/clan.h>
 
 #include "flow.h"
+#include "data.h"
 
 #endif
