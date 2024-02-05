@@ -1,6 +1,6 @@
 #include "main.h"
 
-extern TCD_Flow *tcdFlow;
+extern TCD_FlowData *tcdFlowData;
 
 void cliMiddleware(int argc, char** argv) {
     if (2 < argc && argc < 3) {
@@ -17,34 +17,25 @@ int main(int argc, char** argv) {
     char *outputFilename = argc > 3 ? argv[3] : "out.c";
     initTcdFlow(inputFilename, outputFilename);
     
-    tcdGoToNextStep(); // TODO: for now, we consider we have passed the first step.
-
     #pragma region Step1
 
     /* Step 1: Extract loops polytope representation */
-    tcdPrintStep();
-
     osl_scop_p scop;
     clan_options_p options;
     /* Default option setting. */
     options = clan_options_malloc() ;
     /* Extraction of the SCoP. */
-    FILE *entryFile = fopen(tcdFlow->flowData->entryFile.vanilla, "r");
+    FILE *entryFile = fopen(tcdFlowData->entryFile, "r");
     scop = clan_scop_extract(entryFile, options);
     printf("Language: %s\n", scop->language);
 
-    tcdFlow->flowData->scop = scop;
+    tcdFlowData->scop = scop;
 
     #pragma endregion
-
-    tcdGoToNextStep();
 
     #pragma region Step2
 
     /* Step 2: Extract loops terminals */
-    tcdPrintStep();
-
-    // TCD_Boundary boundaries = 
     getBoundaries();
 
     #pragma endregion
