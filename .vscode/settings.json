@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "main.h": "c",
-        "stdio.h": "c"
-    }
+        "stdio.h": "c",
+        "flow.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "enabled"
 }
