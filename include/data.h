@@ -15,34 +15,41 @@
 
 #include "flow.h"
 
-struct iterationDomain {
-    char* iterationDomain;
-    struct iterationDomain *next;
+struct iterationDomain
+{
+  char *iterationDomain;
+  struct iterationDomain *next;
 };
 typedef struct iterationDomain *TCD_IterationDomain;
 TCD_IterationDomain copyIterationDomain(TCD_IterationDomain original);
 
-struct iterationDomainList {
+struct iterationDomainList
+{
   TCD_IterationDomain first;
 };
 typedef struct iterationDomainList *TCD_IterationDomainList;
-
 
 /**
  * @brief Boundary list
  */
 struct boundary
 {
-    /**
-     * @brief The iteration domain unions to pass to Trhahre
-     */
-    TCD_IterationDomainList firstIterDomainOfUnion;
-    /**
-     * @brief Next loop boundaries
-     */
-    struct boundary *next;
+  /**
+   * @brief The iteration domain unions to pass to Trhahre
+   */
+  TCD_IterationDomainList firstIterDomainOfUnion;
+  /**
+   * @brief Next loop boundaries
+   */
+  struct boundary *next;
 };
 typedef struct boundary *TCD_Boundary;
+
+struct boundaryList
+{
+  TCD_Boundary first;
+};
+typedef struct boundaryList *TCD_BoundaryList;
 
 /**
  * @brief Get a boundary given a domain
@@ -54,23 +61,26 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p iteratorStrings)
 
 /**
  * @brief Get the Boundaries object from the current scop
- * @return TCD_Boundary
+ * @return TCD_BoundaryList
  */
-TCD_Boundary getBoundaries();
+TCD_BoundaryList getBoundaries();
 
+void printBoundaries(TCD_BoundaryList boundaryList);
+TCD_Boundary copyBoundary(TCD_Boundary original);
 
-static
-char ** osl_relation_strings(osl_relation_p relation, osl_names_p names) {
-  char ** strings;
+static char **osl_relation_strings(osl_relation_p relation, osl_names_p names)
+{
+  char **strings;
   char temp[OSL_MAX_STRING];
   int i, offset;
-  
-  if ((relation == NULL) || (names == NULL)) {
+
+  if ((relation == NULL) || (names == NULL))
+  {
     OSL_debug("no names or relation to build the name array");
     return NULL;
   }
 
-  OSL_malloc(strings, char **, (relation->nb_columns + 1)*sizeof(char *));
+  OSL_malloc(strings, char **, (relation->nb_columns + 1) * sizeof(char *));
   strings[relation->nb_columns] = NULL;
 
   // 1. Equality/inequality marker.
@@ -78,24 +88,29 @@ char ** osl_relation_strings(osl_relation_p relation, osl_names_p names) {
   offset = 1;
 
   // 2. Output dimensions.
-  if (osl_relation_is_access(relation)) {
+  if (osl_relation_is_access(relation))
+  {
     // The first output dimension is the array name.
     OSL_strdup(strings[offset], "Arr");
     // The other ones are the array dimensions [1]...[n]
-    for (i = offset + 1; i < relation->nb_output_dims + offset; i++) {
+    for (i = offset + 1; i < relation->nb_output_dims + offset; i++)
+    {
       sprintf(temp, "[%d]", i - 1);
       OSL_strdup(strings[i], temp);
     }
   }
-  else
-  if ((relation->type == OSL_TYPE_DOMAIN) ||
-      (relation->type == OSL_TYPE_CONTEXT)) {
-    for (i = offset; i < relation->nb_output_dims + offset; i++) {
+  else if ((relation->type == OSL_TYPE_DOMAIN) ||
+           (relation->type == OSL_TYPE_CONTEXT))
+  {
+    for (i = offset; i < relation->nb_output_dims + offset; i++)
+    {
       OSL_strdup(strings[i], names->iterators->string[i - offset]);
     }
   }
-  else {
-    for (i = offset; i < relation->nb_output_dims + offset; i++) {
+  else
+  {
+    for (i = offset; i < relation->nb_output_dims + offset; i++)
+    {
       OSL_strdup(strings[i], names->scatt_dims->string[i - offset]);
     }
   }
@@ -122,17 +137,17 @@ char ** osl_relation_strings(osl_relation_p relation, osl_names_p names) {
   return strings;
 }
 
-static
-osl_names_p osl_statement_names(osl_statement_p statement) {
+static osl_names_p osl_statement_names(osl_statement_p statement)
+{
   int nb_parameters = OSL_UNDEFINED;
-  int nb_iterators  = OSL_UNDEFINED;
-  int nb_scattdims  = OSL_UNDEFINED;
-  int nb_localdims  = OSL_UNDEFINED;
-  int array_id      = OSL_UNDEFINED;
+  int nb_iterators = OSL_UNDEFINED;
+  int nb_scattdims = OSL_UNDEFINED;
+  int nb_localdims = OSL_UNDEFINED;
+  int array_id = OSL_UNDEFINED;
 
   osl_statement_get_attributes(statement, &nb_parameters, &nb_iterators,
-                               &nb_scattdims,  &nb_localdims, &array_id);
-  
+                               &nb_scattdims, &nb_localdims, &array_id);
+
   return osl_names_generate("P", nb_parameters,
                             "i", nb_iterators,
                             "c", nb_scattdims,
@@ -140,23 +155,22 @@ osl_names_p osl_statement_names(osl_statement_p statement) {
                             "A", array_id);
 }
 
-static
-osl_names_p osl_relation_names(osl_relation_p relation) {
+static osl_names_p osl_relation_names(osl_relation_p relation)
+{
   int nb_parameters = OSL_UNDEFINED;
-  int nb_iterators  = OSL_UNDEFINED;
-  int nb_scattdims  = OSL_UNDEFINED;
-  int nb_localdims  = OSL_UNDEFINED;
-  int array_id      = OSL_UNDEFINED;
+  int nb_iterators = OSL_UNDEFINED;
+  int nb_scattdims = OSL_UNDEFINED;
+  int nb_localdims = OSL_UNDEFINED;
+  int array_id = OSL_UNDEFINED;
 
   osl_relation_get_attributes(relation, &nb_parameters, &nb_iterators,
                               &nb_scattdims, &nb_localdims, &array_id);
-  
+
   return osl_names_generate("P", nb_parameters,
                             "i", nb_iterators,
                             "c", nb_scattdims,
                             "l", nb_localdims,
                             "A", array_id);
 }
-
 
 #endif
