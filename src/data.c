@@ -7,12 +7,10 @@ TCD_IterationDomain copyIterationDomain(TCD_IterationDomain original)
   if (original == NULL)
     return NULL;
 
-  // Allocate memory for the new structure
   TCD_IterationDomain copy = (TCD_IterationDomain)malloc(sizeof(struct iterationDomain));
   if (copy == NULL)
     return NULL;
 
-  // Copy iterationDomain string
   copy->iterationDomain = strdup(original->iterationDomain);
   if (copy->iterationDomain == NULL)
   {
@@ -20,7 +18,6 @@ TCD_IterationDomain copyIterationDomain(TCD_IterationDomain original)
     return NULL;
   }
 
-  // Copy next pointer recursively
   copy->next = copyIterationDomain(original->next);
 
   return copy;
@@ -93,8 +90,8 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
       if (string[i] == ' ')
         string[i] = ',';
     }
-    strcat(unuaryUnion, string);
 
+    strcat(unuaryUnion, string);
     strcat(unuaryUnion, "] -> { [");
 
     for (int _i = 1; _i <= statement->domain->nb_output_dims; _i++)
@@ -279,16 +276,13 @@ TCD_Boundary copyBoundary(TCD_Boundary original)
   if (original == NULL)
     return NULL;
 
-  // Allocate memory for the new structure
   TCD_Boundary copy = (TCD_Boundary)malloc(sizeof(struct boundary));
   if (copy == NULL)
     return NULL;
 
-  // Copy firstIterDomainOfUnion
   copy->firstIterDomainOfUnion = (TCD_IterationDomainList)malloc(sizeof(struct iterationDomainList));
   copy->firstIterDomainOfUnion->first = copyIterationDomain(original->firstIterDomainOfUnion->first);
 
-  // Copy next pointer recursively
   copy->next = copyBoundary(original->next);
 
   return copy;

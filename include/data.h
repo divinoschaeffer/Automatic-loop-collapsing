@@ -21,6 +21,12 @@ struct iterationDomain
   struct iterationDomain *next;
 };
 typedef struct iterationDomain *TCD_IterationDomain;
+
+/**
+ * @brief Copy an iteration domain
+ * @param original
+ * @return TCD_IterationDomain
+ */
 TCD_IterationDomain copyIterationDomain(TCD_IterationDomain original);
 
 struct iterationDomainList
@@ -65,7 +71,17 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p iteratorStrings)
  */
 TCD_BoundaryList getBoundaries();
 
+/**
+ * @brief Print the boundaries
+ * @param boundaryList
+ */
 void printBoundaries(TCD_BoundaryList boundaryList);
+
+/**
+ * @brief Copy a boundary
+ * @param original
+ * @return TCD_Boundary
+ */
 TCD_Boundary copyBoundary(TCD_Boundary original);
 
 static char **osl_relation_strings(osl_relation_p relation, osl_names_p names)
@@ -135,42 +151,6 @@ static char **osl_relation_strings(osl_relation_p relation, osl_names_p names)
   OSL_strdup(strings[offset], "1");
 
   return strings;
-}
-
-static osl_names_p osl_statement_names(osl_statement_p statement)
-{
-  int nb_parameters = OSL_UNDEFINED;
-  int nb_iterators = OSL_UNDEFINED;
-  int nb_scattdims = OSL_UNDEFINED;
-  int nb_localdims = OSL_UNDEFINED;
-  int array_id = OSL_UNDEFINED;
-
-  osl_statement_get_attributes(statement, &nb_parameters, &nb_iterators,
-                               &nb_scattdims, &nb_localdims, &array_id);
-
-  return osl_names_generate("P", nb_parameters,
-                            "i", nb_iterators,
-                            "c", nb_scattdims,
-                            "l", nb_localdims,
-                            "A", array_id);
-}
-
-static osl_names_p osl_relation_names(osl_relation_p relation)
-{
-  int nb_parameters = OSL_UNDEFINED;
-  int nb_iterators = OSL_UNDEFINED;
-  int nb_scattdims = OSL_UNDEFINED;
-  int nb_localdims = OSL_UNDEFINED;
-  int array_id = OSL_UNDEFINED;
-
-  osl_relation_get_attributes(relation, &nb_parameters, &nb_iterators,
-                              &nb_scattdims, &nb_localdims, &array_id);
-
-  return osl_names_generate("P", nb_parameters,
-                            "i", nb_iterators,
-                            "c", nb_scattdims,
-                            "l", nb_localdims,
-                            "A", array_id);
 }
 
 #endif
