@@ -1,5 +1,39 @@
 # Automatic-loop-collapsing
 
+## Dependencies
+
+In order
+- [GMP](https://gmplib.org/)
+- [NTL](http://www.shoup.net/ntl/)
+- Polylib
+- [isl](http://isl.gforge.inria.fr/)
+- Barvinok
+- trahrhe
+- osl
+- clan
+- [cloog](http://www.cloog.org/)
+
+Powerful commands:
+---
+missing libs stuff after install from third party
+
+`sudo cp /usr/local/lib/lib<LIB_NAME>*   /usr/lib`
+
+---
+barvinok
+
+`./configure NTL_STD_CXX=on NTL_GMP_LIP=on PREFIX=/usr/local GMP_PREFIX=$HOME/sw SHARED=on`
+
+---
+autoreconf stuff
+
+`apt-get install dh-autoreconf`
+
+---
+creating symbolic links stuff
+
+`sudo ln -s /usr/local/lib/libbarvinok.so.0 /usr/lib/libbarvinok.so.0`
+
 ## Liens utiles
 
 - Benchmarks: polybench <https://web.cs.ucla.edu/~pouchet/software/polybench/>
