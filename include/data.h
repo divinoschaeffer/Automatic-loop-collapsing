@@ -11,7 +11,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <clan/clan.h>
 
 #include "flow.h"
 

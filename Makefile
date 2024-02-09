@@ -2,7 +2,7 @@ CC = gcc
 ROOTDIR = $(shell pwd)
 
 # CFLAGS  = -g -Wall -I$(ROOTDIR)/clan/include -L$(ROOTDIR)/clan -I$(ROOTDIR)/clan/osl/include -L$(ROOTDIR)/clan/osl
-CFLAGS  = -lclan -losl -Iinclude
+CFLAGS  = -losl -lclan -Iinclude -L$(ROOTDIR)/cloog -I$(ROOTDIR)/cloog/include -lcloog
 OUTPUT_DIR = .dist
 
 TARGET = collapse

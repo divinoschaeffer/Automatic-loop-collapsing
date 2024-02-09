@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 #pragma region Step4
 
     /* Step 4: Generate output code */
-    // generateOutputCode(boundaryList);
+    generateCode(boundaryList);
 
 #pragma endregion
 
