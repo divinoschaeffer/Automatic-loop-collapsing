@@ -2,7 +2,12 @@
     "files.associations": {
         "main.h": "c",
         "stdio.h": "c",
-        "flow.h": "c"
+        "flow.h": "c",
+        "data.h": "c",
+        "iterator": "c",
+        "clan.h": "c",
+        "utility": "c"
     },
-    "C_Cpp.errorSquiggles": "enabled"
+    "C_Cpp.errorSquiggles": "enabled",
+    "cmake.configureOnOpen": true
 }

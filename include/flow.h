@@ -45,23 +45,4 @@ void initTcdFlow(char* inputFilename, char* outputFilename);
  */
 void endTcdFlow();
 
-/**
- * At some point, we may want to transit our data structure through terminal scripts.
- * In this purpose, it is interesting to have the following functions.
- */
-
-/**
- * @brief Writes a JSON representing the current structure of the collapsing flow.
- * @param filename the name of the flow's JSON file to generate.
- */
-void exportTcdFlow(char *filename);
-
-/**
- * @brief Reads a JSON representing the a collapsing flow and loads it in the
- * current states.
- * @note This operation overrides the current flow it there is one.
- * @param filename the name of the flow's JSON file.
- */
-void importTcdFlow(char *filename);
-
 #endif
