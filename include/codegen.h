@@ -7,14 +7,11 @@
  * @copyright Copyright (c) 2024
  */
 
-#ifndef __TCD_CODEGEN_H
-#define __TCD_CODEGEN_H
+#ifndef __CODEGEN_H
+#define __CODEGEN_H
 
 #include <osl/osl.h>
 #include <cloog/isl/cloog.h>
-#include <cloog/cloog.h>
-#include <isl/ctx.h>
-#include <isl/set.h>
 
 #include "flow.h"
 #include "data.h"
@@ -24,5 +21,7 @@
  * @param boundaryList The boundary list
  */
 void generateCode(TCD_BoundaryList boundaryList);
+
+CloogState *cloog_isl_state_malloc(struct isl_ctx *ctx);
 
 #endif

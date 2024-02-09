@@ -28,7 +28,6 @@ void generateCode(TCD_BoundaryList boundaryList)
         fprintf(stderr, "Error: Unable to open file %s\n", tcdFlowData->outputFile);
         exit(EXIT_FAILURE);
     }
-
     state = cloog_isl_state_malloc(isl_ctx_alloc());
     options = cloog_options_malloc(state);
 
@@ -49,4 +48,7 @@ void generateCode(TCD_BoundaryList boundaryList)
         fprintf(stderr, "Error: Unable to generate clast from input\n");
         exit(EXIT_FAILURE);
     }
+
+    // Generate the output code
+    clast_pprint(outputFile, root, 0, options);
 }
