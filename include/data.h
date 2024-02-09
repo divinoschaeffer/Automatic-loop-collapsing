@@ -10,69 +10,146 @@
 #define __DATA_H
 
 #include <stdlib.h>
-#include <clan/clan.h>
+#include <string.h>
 
 #include "flow.h"
 
+struct iterationDomain
+{
+  char *iterationDomain;
+  struct iterationDomain *next;
+};
+typedef struct iterationDomain *TCD_IterationDomain;
 
 /**
- * @brief Returns the iterators names from a domain given a set of names?
- * @param domain 
- * @param names 
- * @return char** 
+ * @brief Copy an iteration domain
+ * @param original
+ * @return TCD_IterationDomain
  */
-char **domain_strings(osl_relation_p domain, osl_names_t* names);
+TCD_IterationDomain copyIterationDomain(TCD_IterationDomain original);
 
-
-/**
- * @brief Loop variable structure
- */
-typedef struct Variable {
-    /**
-     * @brief The name of the variable
-     */
-    char *name;
-    /**
-     * @brief Upper boundary
-     */
-    char* upperBound;
-    /**
-     * @brief Lower boundary
-     */
-    char* lowerBound;
-    /**
-     * @brief Next variable
-     */
-    struct Variable *next;
-} *TCD_Variable;
+struct iterationDomainList
+{
+  TCD_IterationDomain first;
+};
+typedef struct iterationDomainList *TCD_IterationDomainList;
 
 /**
  * @brief Boundary list
  */
-typedef struct Boundary
+struct boundary
 {
-    /**
-     * @brief List of variables of the current loops node
-     */
-    TCD_Variable variables;
-    /**
-     * @brief Next loop boundaries
-     */
-    struct Boundary *next;
-} *TCD_Boundary;
+  /**
+   * @brief The iteration domain unions to pass to Trhahre
+   */
+  TCD_IterationDomainList firstIterDomainOfUnion;
+  /**
+   * @brief Next loop boundaries
+   */
+  struct boundary *next;
+};
+typedef struct boundary *TCD_Boundary;
 
+struct boundaryList
+{
+  TCD_Boundary first;
+};
+typedef struct boundaryList *TCD_BoundaryList;
 
 /**
  * @brief Get a boundary given a domain
- * @param domain 
- * @return TCD_Boundary 
+ * @param statement
+ * @param iteratorStrings
+ * @return TCD_Boundary
  */
-TCD_Boundary getBoundary(osl_relation_p domain);
+TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p iteratorStrings);
 
 /**
  * @brief Get the Boundaries object from the current scop
+ * @return TCD_BoundaryList
+ */
+TCD_BoundaryList getBoundaries();
+
+/**
+ * @brief Print the boundaries
+ * @param boundaryList
+ */
+void printBoundaries(TCD_BoundaryList boundaryList);
+
+/**
+ * @brief Copy a boundary
+ * @param original
  * @return TCD_Boundary
  */
-TCD_Boundary getBoundaries();
+TCD_Boundary copyBoundary(TCD_Boundary original);
+
+static char **osl_relation_strings(osl_relation_p relation, osl_names_p names)
+{
+  char **strings;
+  char temp[OSL_MAX_STRING];
+  int i, offset;
+
+  if ((relation == NULL) || (names == NULL))
+  {
+    OSL_debug("no names or relation to build the name array");
+    return NULL;
+  }
+
+  OSL_malloc(strings, char **, (relation->nb_columns + 1) * sizeof(char *));
+  strings[relation->nb_columns] = NULL;
+
+  // 1. Equality/inequality marker.
+  OSL_strdup(strings[0], "e/i");
+  offset = 1;
+
+  // 2. Output dimensions.
+  if (osl_relation_is_access(relation))
+  {
+    // The first output dimension is the array name.
+    OSL_strdup(strings[offset], "Arr");
+    // The other ones are the array dimensions [1]...[n]
+    for (i = offset + 1; i < relation->nb_output_dims + offset; i++)
+    {
+      sprintf(temp, "[%d]", i - 1);
+      OSL_strdup(strings[i], temp);
+    }
+  }
+  else if ((relation->type == OSL_TYPE_DOMAIN) ||
+           (relation->type == OSL_TYPE_CONTEXT))
+  {
+    for (i = offset; i < relation->nb_output_dims + offset; i++)
+    {
+      OSL_strdup(strings[i], names->iterators->string[i - offset]);
+    }
+  }
+  else
+  {
+    for (i = offset; i < relation->nb_output_dims + offset; i++)
+    {
+      OSL_strdup(strings[i], names->scatt_dims->string[i - offset]);
+    }
+  }
+  offset += relation->nb_output_dims;
+
+  // 3. Input dimensions.
+  for (i = offset; i < relation->nb_input_dims + offset; i++)
+    OSL_strdup(strings[i], names->iterators->string[i - offset]);
+  offset += relation->nb_input_dims;
+
+  // 4. Local dimensions.
+  for (i = offset; i < relation->nb_local_dims + offset; i++)
+    OSL_strdup(strings[i], names->local_dims->string[i - offset]);
+  offset += relation->nb_local_dims;
+
+  // 5. Parameters.
+  for (i = offset; i < relation->nb_parameters + offset; i++)
+    OSL_strdup(strings[i], names->parameters->string[i - offset]);
+  offset += relation->nb_parameters;
+
+  // 6. Scalar.
+  OSL_strdup(strings[offset], "1");
+
+  return strings;
+}
 
 #endif

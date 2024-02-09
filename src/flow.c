@@ -25,9 +25,3 @@ void endTcdFlow(void)
 {
     free(tcdFlowData);
 }
-
-void exportTcdFlow(char *filename) {
-}
-
-void importTcdFlow(char *filename) {
-}
