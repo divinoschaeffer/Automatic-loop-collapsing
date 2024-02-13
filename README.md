@@ -3,7 +3,8 @@
 ## Dependencies
 
 In order
-- [GMP](https://gmplib.org/)
+- [GMP]
+- (https://gmplib.org/)
 - [NTL](http://www.shoup.net/ntl/)
 - Polylib
 - [isl](http://isl.gforge.inria.fr/)

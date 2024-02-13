@@ -38,7 +38,7 @@ typedef struct
 /**
  * @brief Inits the Tcd_Flow structure
  */
-void initTcdFlow(char* inputFilename, char* outputFilename);
+void initTcdFlow(char *inputFilename, char *outputFilename);
 
 /**
  * @brief Destruct the Tcd_Flow and frees all memories spaces linked to it.

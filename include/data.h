@@ -44,6 +44,18 @@ struct boundary
    */
   TCD_IterationDomainList firstIterDomainOfUnion;
   /**
+   * @brief Outer loop variable
+   */
+  char *outerLoopVar;
+  /**
+   * @brief Outer loop upper bound
+   */
+  char *outerLoopUpperBound;
+  /**
+   * @brief Iteration domains string
+   */
+  char *iterationDomainsString;
+  /**
    * @brief Next loop boundaries
    */
   struct boundary *next;
