@@ -13,6 +13,15 @@ In order
 - clan
 - [cloog](http://www.cloog.org/)
 
+Full installation procedure
+
+1. Get GMP using the procedure described in https://libntl.org/doc/tour-gmp.html (note the $HOME/sw)
+2. Get NTL using the info in this same page
+3. Get ISL
+4. You should now be able to get Barvinok 
+. ./configure --with-isl=bundled
+
+
 Powerful commands:
 ---
 missing libs stuff after install from third party
