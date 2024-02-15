@@ -88,8 +88,16 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
     for (i = 0; i < len; i++)
     {
       if (string[i] == ' ')
+      {
         string[i] = ',';
+      }
     }
+
+    // first elem of "string" is the outer loop var, elems are separated by commas
+    // get first elem of "string" and store it in boundary->outerLoopVar
+    char *elemsOfString = strtok(string, ",");
+    boundary->outerLoopUpperBound = (char *)malloc(strlen(elemsOfString) * sizeof(char));
+    strcpy(boundary->outerLoopUpperBound, elemsOfString);
 
     strcat(unuaryUnion, string);
     strcat(unuaryUnion, "] -> { [");
@@ -101,9 +109,16 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
         strcat(unionList, name_array[_i]);
         if (_i != statement->domain->nb_output_dims)
           strcat(unionList, ",");
+        if (_i == 1)
+        {
+          boundary->outerLoopVar = (char *)malloc(strlen(name_array[_i]) * sizeof(char));
+          strcpy(boundary->outerLoopVar, name_array[_i]);
+        }
       }
     }
 
+    boundary->iterationDomainsString = (char *)malloc(len * sizeof(char));
+    strcpy(boundary->iterationDomainsString, unionList);
     strcat(unuaryUnion, unionList);
     strcat(unuaryUnion, "] : ");
 

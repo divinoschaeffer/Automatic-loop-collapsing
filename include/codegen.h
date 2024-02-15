@@ -15,6 +15,9 @@
 
 #include "flow.h"
 #include "data.h"
+#include "format_helper.h"
+
+#define REGION_COMPLETE_WATERMARK "#pragma TCD_COMPLETE_REGION\0\n"
 
 /**
  * @brief Computes the new SCoP structure using the scop in global flow and the boundary list
