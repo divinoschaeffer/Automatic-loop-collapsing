@@ -11,6 +11,8 @@
 
 extern TCD_FlowData *tcdFlowData;
 
+unsigned boundary_index = 0;
+
 char *write_init_section(TCD_Boundary boundary)
 {
     char *outputString = (char *)malloc(1024 * sizeof(char));
@@ -21,19 +23,24 @@ char *write_init_section(TCD_Boundary boundary)
 
     outputString[0] = '\0';
 
-    strcat(outputString, "unsigned pc;\n");
     char *tmp = (char *)malloc(1024 * sizeof(char));
-    sprintf(tmp, "unsigned upperBound = %s_Ehrhart(%s);\n", outer_var, outer_var_bound);
+    sprintf(tmp, "unsigned pc_%d;\n", boundary_index);
     strcat(outputString, tmp);
-    strcat(outputString, "unsigned first_iteration = 1;\n");
-    sprintf(tmp, "#pragma omp for private(%s) firstprivate(first_iteration) schedule(static)\n", iteration_domains);
+    // we need to index ehrhart calls as they may be outer vars with the same name among different boundaries
+    sprintf(tmp, "unsigned upper_bound_%d = %s_Ehrhart%d(%s);\n", boundary_index, outer_var, boundary_index, outer_var_bound);
     strcat(outputString, tmp);
-    strcat(outputString, "for (pc = 1; pc <= upperBound; pc++)\n");
+    sprintf(tmp, "unsigned first_iteration_%d = 1;\n", boundary_index);
+    strcat(outputString, tmp);
+    sprintf(tmp, "#pragma omp for private(%s) firstprivate(first_iteration_%d) schedule(static)\n", iteration_domains, boundary_index);
+    strcat(outputString, tmp);
+    strcat(outputString, "for (pc = 1; pc <= upper_bound; pc++)\n");
     strcat(outputString, "{\n");
-    strcat(outputString, "\tif (first_iteration)\n");
+    sprintf(tmp, "\tif (first_iteration_%d)\n", boundary_index);
+    strcat(outputString, tmp);
     strcat(outputString, "\t{\n");
     // TODO: for every iteration variables, do the trahrhe function call here
-    strcat(outputString, "\t\tfirst_iteration = 0;\n");
+    sprintf(tmp, "\t\tfirst_iteration_%d = 0;\n", boundary_index);
+    strcat(outputString, tmp);
     strcat(outputString, "\t}\n");
     strcat(outputString, "\t\n");
 
@@ -67,6 +74,9 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
 
     // Iteration code
     // TODO: Insert the iteration code here
+
+    // Finalisation code
+    fprintf(outputFile, "}\n\n");
 }
 
 void generateCode(TCD_BoundaryList boundaryList)
@@ -113,12 +123,12 @@ void generateCode(TCD_BoundaryList boundaryList)
         }
 
         generateCodeSegment(root, options, boundary, outputFile);
+
+        // Next boundary
         boundary = boundary->next;
         scop = scop->next;
+        boundary_index++;
     }
-
-    // Finalisation code
-    fprintf(outputFile, "}\n");
 
     fclose(outputFile);
 }
