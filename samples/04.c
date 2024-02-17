@@ -5,10 +5,13 @@ int main()
 	int k;
 	int l;
 #pragma scop
-	for (i = 0; i < 30; i++)
-		for (j = i; j < 43; j++)
-			for (k = 98; k > 23 || l < 3; k--)
-				(void)i;
+	for (i = 0; i < N - 1; i++)
+	{
+		for (j = i + 1; j < N; j++)
+		{
+			(void)i;
+		}
+	}
 #pragma endscop
 	return 0;
 }

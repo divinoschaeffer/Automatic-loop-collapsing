@@ -31,9 +31,10 @@ char *write_init_section(TCD_Boundary boundary)
     strcat(outputString, tmp);
     sprintf(tmp, "unsigned first_iteration_%d = 1;\n", boundary_index);
     strcat(outputString, tmp);
-    sprintf(tmp, "#pragma omp for private(%s) firstprivate(first_iteration_%d) schedule(static)\n", iteration_domains, boundary_index);
+    sprintf(tmp, "#pragma omp parallel for private(%s) firstprivate(first_iteration_%d) schedule(static)\n", iteration_domains, boundary_index);
     strcat(outputString, tmp);
-    strcat(outputString, "for (pc = 1; pc <= upper_bound; pc++)\n");
+    sprintf(tmp, "for (pc_%d = 1; pc_%d <= upper_bound_%d; pc_%d++)\n", boundary_index, boundary_index, boundary_index, boundary_index);
+    strcat(outputString, tmp);
     strcat(outputString, "{\n");
     sprintf(tmp, "\tif (first_iteration_%d)\n", boundary_index);
     strcat(outputString, tmp);
@@ -55,9 +56,62 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
     fprintf(outputFile, "%s", write_init_section(boundary));
 
     // Insert the actual unchanged code
-    // TODO: Remove from scop the part that is not in the iteration domain (ie handled by manual code generation)
-    // TODO: Get and put the actual statement code here (for now, they are displayed as functions)
     FILE *tmp = fopen("tmp.c", "w+");
+
+    if (tmp == NULL)
+    {
+        fprintf(stderr, "Error: Unable to open file tmp.c\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // DONE - Remove from scop the part that is not in the iteration domain (ie handled by manual code generation)
+    // while we are have not hit the depth of parallelism of the boundary, we need to go deeper in the loop nest
+    // int loop_nest_depth = boundary->depth;
+    int loop_nest_depth = 2;
+    while (loop_nest_depth > 0)
+    {
+        if (CLAST_STMT_IS_A(root, stmt_root))
+        {
+            struct clast_root *root_stmt = (struct clast_root *)root;
+            // equation, n, then
+            root = root_stmt->stmt.next;
+        }
+
+        else if (CLAST_STMT_IS_A(root, stmt_for))
+        {
+            struct clast_for *for_stmt = (struct clast_for *)root;
+            root = for_stmt->body;
+            loop_nest_depth--;
+        }
+        else if (CLAST_STMT_IS_A(root, stmt_block))
+        {
+            struct clast_block *block_stmt = (struct clast_block *)root;
+            root = block_stmt->body;
+        }
+        else if (CLAST_STMT_IS_A(root, stmt_user))
+        {
+            struct clast_user_stmt *user_stmt = (struct clast_user_stmt *)root;
+            root = user_stmt->substitutions;
+        }
+        else if (CLAST_STMT_IS_A(root, stmt_guard))
+        {
+            struct clast_guard *guard_stmt = (struct clast_guard *)root;
+            root = guard_stmt->then;
+        }
+        else if (CLAST_STMT_IS_A(root, stmt_ass))
+        {
+            struct clast_assignment *ass = (struct clast_assignment *)root;
+            root = ass->stmt.next;
+        }
+        else
+        {
+            fprintf(stderr, "Error: Unable to find the loop nest depth\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+    // TODO: Get and put the actual statement code here (for now, they are displayed as functions)
+
+    // Write the output
     clast_pprint(tmp, root, 0, options);
 
     fseek(tmp, 0, SEEK_END);
@@ -91,6 +145,9 @@ void generateCode(TCD_BoundaryList boundaryList)
 
     state = cloog_isl_state_malloc(isl_ctx_alloc());
     options = cloog_options_malloc(state);
+    options->openscop = 1;
+    options->scop = scop;
+    options->compilable = 1;
 
     FILE *outputFile = fopen(tcdFlowData->outputFile, "w+");
 
