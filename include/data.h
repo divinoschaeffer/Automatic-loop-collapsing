@@ -14,9 +14,43 @@
 
 #include "flow.h"
 
+/**
+ * @brief Iteration domain variable dependency representation
+ */
+struct iteratorDependency
+{
+  /**
+   * @brief The iterator
+   */
+  char *iterator;
+  /**
+   * @brief The list of dependencies
+   */
+  char **dependsOnList;
+  struct iteratorDependency *next;
+};
+typedef struct iteratorDependency *TCD_IteratorDependency;
+
+struct iteratorDependencyList
+{
+  TCD_IteratorDependency first;
+};
+typedef struct iteratorDependencyList *TCD_IteratorDependencyList;
+
+/**
+ * @brief Iteration domain representation
+ */
 struct iterationDomain
 {
+  /**
+   * @brief The iteration domain under the ISL format
+   * to pass to Trahrhe
+   */
   char *iterationDomain;
+  /**
+   * @brief List of iteration domain variable dependencies
+   */
+  TCD_IteratorDependencyList firstIteratorDependency;
   struct iterationDomain *next;
 };
 typedef struct iterationDomain *TCD_IterationDomain;

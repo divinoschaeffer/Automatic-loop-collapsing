@@ -40,6 +40,41 @@ char *write_init_section(TCD_Boundary boundary)
     strcat(outputString, tmp);
     strcat(outputString, "\t{\n");
     // TODO: for every iteration variables, do the trahrhe function call here
+    char **iteration_vars_array = (char **)malloc(1024 * sizeof(char *));
+    char *token = strtok(iteration_domains, ",");
+    int i = 0;
+    while (token != NULL)
+    {
+        iteration_vars_array[i] = (char *)malloc(1024 * sizeof(char));
+        strcpy(iteration_vars_array[i], token);
+        token = strtok(NULL, ",");
+        i++;
+    }
+
+    // int max_depth = boundary->depth;
+    int max_depth = 2;
+    int curr_depth = 0;
+    while (curr_depth < max_depth)
+    {
+        // Construct variables on which the iteration variable depends
+        char *iterator_dependent_vars = (char *)malloc(1024 * sizeof(char));
+        char *tmp = (char *)malloc(1024 * sizeof(char));
+        sprintf(tmp, "pc_%d", boundary_index);
+        strcpy(iterator_dependent_vars, tmp);
+        strcat(iterator_dependent_vars, ",");
+        strcat(iterator_dependent_vars, outer_var_bound);
+        for (int i = 0; i < curr_depth; i++)
+        {
+            // TODO: check if the variable is a parameter or a local variable
+            strcat(iterator_dependent_vars, ",");
+            strcat(iterator_dependent_vars, iteration_vars_array[i]);
+        }
+
+        sprintf(tmp, "\t\t%s = %s_trahrhe%d(%s);\n", iteration_vars_array[curr_depth], iteration_vars_array[curr_depth], boundary_index, iterator_dependent_vars);
+        strcat(outputString, tmp);
+
+        curr_depth++;
+    }
     sprintf(tmp, "\t\tfirst_iteration_%d = 0;\n", boundary_index);
     strcat(outputString, tmp);
     strcat(outputString, "\t}\n");
@@ -100,8 +135,8 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
         }
         else if (CLAST_STMT_IS_A(root, stmt_ass))
         {
-            struct clast_assignment *ass = (struct clast_assignment *)root;
-            root = ass->stmt.next;
+            struct clast_assignment *assign = (struct clast_assignment *)root;
+            root = assign->stmt.next;
         }
         else
         {
@@ -109,7 +144,7 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
             exit(EXIT_FAILURE);
         }
     }
-    // TODO: Get and put the actual statement code here (for now, they are displayed as functions)
+    // DONE: Get and put the actual statement code here (for now, they are displayed as functions)
 
     // Write the output
     clast_pprint(tmp, root, 0, options);
