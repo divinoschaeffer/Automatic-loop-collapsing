@@ -13,25 +13,25 @@ extern TCD_FlowData *tcdFlowData;
 
 unsigned boundary_index = 0;
 
-char **getIterationDependencies(TCD_Boundary boundary)
+char ***getIterationDependencies(TCD_Boundary boundary)
 {
     TCD_IterationDomain iterationDomain = boundary->firstIterDomainOfUnion->first;
     TCD_IteratorDependencyList iteratorDependencyList = iterationDomain->firstIteratorDependency;
     TCD_IteratorDependency iteratorDependency = iteratorDependencyList->first;
-    char **iteration_dependencies_array = (char **)malloc(1024 * sizeof(char *));
+    char ***iteration_dependencies_array = (char ***)calloc(1024, sizeof(char **));
     int i = 0;
     int j = 0;
     while (iteratorDependency != NULL)
     {
-        iteration_dependencies_array[i] = (char *)malloc(1024 * sizeof(char));
-        strcpy(iteration_dependencies_array[i], iteratorDependency->iterator);
-        i++;
+        iteration_dependencies_array[i] = (char **)calloc(1024, sizeof(char *));
+        iteration_dependencies_array[i][0] = (char *)calloc(1024, sizeof(char));
+        strcpy(iteration_dependencies_array[i][0], iteratorDependency->iterator);
         for (j = 0; j < iteratorDependency->dependsOnCount; j++)
         {
-            iteration_dependencies_array[i] = (char *)malloc(1024 * sizeof(char));
-            strcpy(iteration_dependencies_array[i], iteratorDependency->dependsOnList[j]);
-            i++;
+            iteration_dependencies_array[i][1] = (char *)calloc(1024, sizeof(char));
+            strcat(iteration_dependencies_array[i][1], iteratorDependency->dependsOnList[j]);
         }
+        i++;
         iteratorDependency = iteratorDependency->next;
     }
     return iteration_dependencies_array;
@@ -45,7 +45,7 @@ write_init_section(TCD_Boundary boundary)
     char *outer_var = boundary->outerLoopVar;
     char *outer_var_bound = boundary->outerLoopUpperBound;
     char *iteration_domains = boundary->iterationDomainsString;
-    char **iteration_dependencies_array = getIterationDependencies(boundary);
+    char ***iteration_dependencies_array = getIterationDependencies(boundary);
 
     outputString[0] = '\0';
 
@@ -70,7 +70,7 @@ write_init_section(TCD_Boundary boundary)
     // int max_depth = boundary->depth;
     int max_depth = 2;
     int curr_depth = 0;
-    while (curr_depth < max_depth)
+    while (curr_depth <= max_depth)
     {
         // Construct variables on which the iteration variable depends
         char *iterator_dependent_vars = (char *)malloc(1024 * sizeof(char));
@@ -83,10 +83,10 @@ write_init_section(TCD_Boundary boundary)
         {
             // TODO: check if the variable is a parameter or a local variable
             strcat(iterator_dependent_vars, ",");
-            strcat(iterator_dependent_vars, iteration_dependencies_array[i]);
+            strcat(iterator_dependent_vars, iteration_dependencies_array[i][1]);
         }
 
-        sprintf(tmp, "\t\t%s = %s_trahrhe%d(%s);\n", iteration_dependencies_array[curr_depth], iteration_dependencies_array[curr_depth], boundary_index, iterator_dependent_vars);
+        sprintf(tmp, "\t\t%s = %s_trahrhe%d(%s);\n", iteration_dependencies_array[curr_depth][0], iteration_dependencies_array[curr_depth][1], boundary_index, iterator_dependent_vars);
         strcat(outputString, tmp);
 
         curr_depth++;
@@ -220,7 +220,7 @@ void generateCode(TCD_BoundaryList boundaryList)
             exit(EXIT_FAILURE);
         }
 
-        cloog_input_dump_cloog(stdout, input, options);
+        // cloog_input_dump_cloog(stdout, input, options);
 
         root = cloog_clast_create_from_input(input, options);
 

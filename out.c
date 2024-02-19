@@ -7,8 +7,8 @@ for (pc_0 = 1; pc_0 <= upper_bound_0; pc_0++)
 	if (first_iteration_0)
 	{
 		i = i_trahrhe0(pc_0,N);
-		i = i_trahrhe0(pc_0,N,i);
-		j = j_trahrhe0(pc_0,N,i,i);
+		j = j_trahrhe0(pc_0,N,i);
+		k = k_trahrhe0(pc_0,N,i,j);
 		first_iteration_0 = 0;
 	}
 	
