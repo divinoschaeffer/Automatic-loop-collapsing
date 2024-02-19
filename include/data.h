@@ -27,6 +27,10 @@ struct iteratorDependency
    * @brief The list of dependencies
    */
   char **dependsOnList;
+  /**
+   * @brief The number of dependencies
+   */
+  int dependsOnCount;
   struct iteratorDependency *next;
 };
 typedef struct iteratorDependency *TCD_IteratorDependency;

@@ -13,13 +13,39 @@ extern TCD_FlowData *tcdFlowData;
 
 unsigned boundary_index = 0;
 
-char *write_init_section(TCD_Boundary boundary)
+char **getIterationDependencies(TCD_Boundary boundary)
+{
+    TCD_IterationDomain iterationDomain = boundary->firstIterDomainOfUnion->first;
+    TCD_IteratorDependencyList iteratorDependencyList = iterationDomain->firstIteratorDependency;
+    TCD_IteratorDependency iteratorDependency = iteratorDependencyList->first;
+    char **iteration_dependencies_array = (char **)malloc(1024 * sizeof(char *));
+    int i = 0;
+    int j = 0;
+    while (iteratorDependency != NULL)
+    {
+        iteration_dependencies_array[i] = (char *)malloc(1024 * sizeof(char));
+        strcpy(iteration_dependencies_array[i], iteratorDependency->iterator);
+        i++;
+        for (j = 0; j < iteratorDependency->dependsOnCount; j++)
+        {
+            iteration_dependencies_array[i] = (char *)malloc(1024 * sizeof(char));
+            strcpy(iteration_dependencies_array[i], iteratorDependency->dependsOnList[j]);
+            i++;
+        }
+        iteratorDependency = iteratorDependency->next;
+    }
+    return iteration_dependencies_array;
+}
+
+char *
+write_init_section(TCD_Boundary boundary)
 {
     char *outputString = (char *)malloc(1024 * sizeof(char));
 
     char *outer_var = boundary->outerLoopVar;
     char *outer_var_bound = boundary->outerLoopUpperBound;
     char *iteration_domains = boundary->iterationDomainsString;
+    char **iteration_dependencies_array = getIterationDependencies(boundary);
 
     outputString[0] = '\0';
 
@@ -39,17 +65,7 @@ char *write_init_section(TCD_Boundary boundary)
     sprintf(tmp, "\tif (first_iteration_%d)\n", boundary_index);
     strcat(outputString, tmp);
     strcat(outputString, "\t{\n");
-    // TODO: for every iteration variables, do the trahrhe function call here
-    char **iteration_vars_array = (char **)malloc(1024 * sizeof(char *));
-    char *token = strtok(iteration_domains, ",");
-    int i = 0;
-    while (token != NULL)
-    {
-        iteration_vars_array[i] = (char *)malloc(1024 * sizeof(char));
-        strcpy(iteration_vars_array[i], token);
-        token = strtok(NULL, ",");
-        i++;
-    }
+    // DONE: for every iteration variables, do the trahrhe function call here
 
     // int max_depth = boundary->depth;
     int max_depth = 2;
@@ -67,10 +83,10 @@ char *write_init_section(TCD_Boundary boundary)
         {
             // TODO: check if the variable is a parameter or a local variable
             strcat(iterator_dependent_vars, ",");
-            strcat(iterator_dependent_vars, iteration_vars_array[i]);
+            strcat(iterator_dependent_vars, iteration_dependencies_array[i]);
         }
 
-        sprintf(tmp, "\t\t%s = %s_trahrhe%d(%s);\n", iteration_vars_array[curr_depth], iteration_vars_array[curr_depth], boundary_index, iterator_dependent_vars);
+        sprintf(tmp, "\t\t%s = %s_trahrhe%d(%s);\n", iteration_dependencies_array[curr_depth], iteration_dependencies_array[curr_depth], boundary_index, iterator_dependent_vars);
         strcat(outputString, tmp);
 
         curr_depth++;

@@ -138,8 +138,45 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
 
     TCD_IterationDomain iterationDomainsUnion = (TCD_IterationDomain)malloc(sizeof(struct iterationDomain));
     iterationDomainsUnion->next = NULL;
+
     iterationDomainsUnion->iterationDomain = (char *)malloc(statement->domain->nb_rows * (OSL_MAX_STRING + 1) * sizeof(char));
     strcpy(iterationDomainsUnion->iterationDomain, unuaryUnion);
+
+    iterationDomainsUnion->firstIteratorDependency = (TCD_IteratorDependencyList)malloc(sizeof(struct iteratorDependencyList));
+    iterationDomainsUnion->firstIteratorDependency->first = NULL;
+
+    // Loop on iterators and build the list of dependencies
+    for (i = 0; i < statement->domain->nb_output_dims; i++)
+    {
+      TCD_IteratorDependency iteratorDependency = (TCD_IteratorDependency)malloc(sizeof(struct iteratorDependency));
+      iteratorDependency->iterator = (char *)malloc(strlen(name_array[i + 1]) * sizeof(char));
+      iteratorDependency->next = NULL;
+
+      // assign the iterator name to the iteratorDependency
+      strcpy(iteratorDependency->iterator, name_array[i + 1]);
+      // TODO: effectively compute the dependencies
+      // for now, we just assign the iterator to itself
+      iteratorDependency->dependsOnList = (char **)malloc(sizeof(char *));
+      iteratorDependency->dependsOnList[0] = (char *)malloc(strlen(name_array[i + 1]) * sizeof(char));
+      strcpy(iteratorDependency->dependsOnList[0], name_array[i + 1]);
+
+      // increment the count of dependencies
+      iteratorDependency->dependsOnCount = 1;
+
+      if (iterationDomainsUnion->firstIteratorDependency->first == NULL)
+      {
+        iterationDomainsUnion->firstIteratorDependency->first = iteratorDependency;
+      }
+      else
+      {
+        TCD_IteratorDependency current = iterationDomainsUnion->firstIteratorDependency->first;
+        while (current->next != NULL)
+        {
+          current = current->next;
+        }
+        current->next = iteratorDependency;
+      }
+    }
 
     // Free the array of strings.
     if (name_array != NULL)
