@@ -13,30 +13,6 @@ extern TCD_FlowData *tcdFlowData;
 
 unsigned boundary_index = 0;
 
-char ***getIterationDependencies(TCD_Boundary boundary)
-{
-    TCD_IterationDomain iterationDomain = boundary->firstIterDomainOfUnion->first;
-    TCD_IteratorDependencyList iteratorDependencyList = iterationDomain->firstIteratorDependency;
-    TCD_IteratorDependency iteratorDependency = iteratorDependencyList->first;
-    char ***iteration_dependencies_array = (char ***)calloc(1024, sizeof(char **));
-    int i = 0;
-    int j = 0;
-    while (iteratorDependency != NULL)
-    {
-        iteration_dependencies_array[i] = (char **)calloc(1024, sizeof(char *));
-        iteration_dependencies_array[i][0] = (char *)calloc(1024, sizeof(char));
-        strcpy(iteration_dependencies_array[i][0], iteratorDependency->iterator);
-        for (j = 0; j < iteratorDependency->dependsOnCount; j++)
-        {
-            iteration_dependencies_array[i][1] = (char *)calloc(1024, sizeof(char));
-            strcat(iteration_dependencies_array[i][1], iteratorDependency->dependsOnList[j]);
-        }
-        i++;
-        iteratorDependency = iteratorDependency->next;
-    }
-    return iteration_dependencies_array;
-}
-
 char *
 write_init_section(TCD_Boundary boundary)
 {
@@ -45,7 +21,7 @@ write_init_section(TCD_Boundary boundary)
     char *outer_var = boundary->outerLoopVar;
     char *outer_var_bound = boundary->outerLoopUpperBound;
     char *iteration_domains = boundary->iterationDomainsString;
-    char ***iteration_dependencies_array = getIterationDependencies(boundary);
+    char **name_array = boundary->nameArray;
 
     outputString[0] = '\0';
 
@@ -70,7 +46,7 @@ write_init_section(TCD_Boundary boundary)
     // int max_depth = boundary->depth;
     int max_depth = 2;
     int curr_depth = 0;
-    while (curr_depth <= max_depth)
+    while (curr_depth < max_depth)
     {
         // Construct variables on which the iteration variable depends
         char *iterator_dependent_vars = (char *)malloc(1024 * sizeof(char));
@@ -79,14 +55,18 @@ write_init_section(TCD_Boundary boundary)
         strcpy(iterator_dependent_vars, tmp);
         strcat(iterator_dependent_vars, ",");
         strcat(iterator_dependent_vars, outer_var_bound);
-        for (int i = 0; i < curr_depth; i++)
-        {
-            // TODO: check if the variable is a parameter or a local variable
-            strcat(iterator_dependent_vars, ",");
-            strcat(iterator_dependent_vars, iteration_dependencies_array[i][1]);
-        }
 
-        sprintf(tmp, "\t\t%s = %s_trahrhe%d(%s);\n", iteration_dependencies_array[curr_depth][0], iteration_dependencies_array[curr_depth][1], boundary_index, iterator_dependent_vars);
+        char *iterator = name_array[curr_depth + 1];
+        printf("[iterator] = %s --- ", iterator);
+
+        if (strcmp(lookup(iterator)->defn, "") != 0)
+        {
+            strcat(iterator_dependent_vars, ",");
+            strcat(iterator_dependent_vars, lookup(iterator)->defn);
+        }
+        printf("%s\n", lookup(iterator)->defn);
+
+        sprintf(tmp, "\t\t%s = %s_trahrhe%d(%s);\n", name_array[curr_depth + 1], name_array[curr_depth + 1], boundary_index, iterator_dependent_vars);
         strcat(outputString, tmp);
 
         curr_depth++;

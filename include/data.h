@@ -11,35 +11,12 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+#include <ctype.h>
 
 #include "flow.h"
-
-/**
- * @brief Iteration domain variable dependency representation
- */
-struct iteratorDependency
-{
-  /**
-   * @brief The iterator
-   */
-  char *iterator;
-  /**
-   * @brief The list of dependencies
-   */
-  char **dependsOnList;
-  /**
-   * @brief The number of dependencies
-   */
-  int dependsOnCount;
-  struct iteratorDependency *next;
-};
-typedef struct iteratorDependency *TCD_IteratorDependency;
-
-struct iteratorDependencyList
-{
-  TCD_IteratorDependency first;
-};
-typedef struct iteratorDependencyList *TCD_IteratorDependencyList;
+#include "hashtable.h"
+#include "format_helper.h"
 
 /**
  * @brief Iteration domain representation
@@ -51,10 +28,6 @@ struct iterationDomain
    * to pass to Trahrhe
    */
   char *iterationDomain;
-  /**
-   * @brief List of iteration domain variable dependencies
-   */
-  TCD_IteratorDependencyList firstIteratorDependency;
   struct iterationDomain *next;
 };
 typedef struct iterationDomain *TCD_IterationDomain;
@@ -93,6 +66,19 @@ struct boundary
    * @brief Iteration domains string
    */
   char *iterationDomainsString;
+  /**
+   * @brief An array of string representing the list of dependencies
+   * of the iterators in the same order as the iterators in the domain
+   */
+  char ***iteratorDependenciesArray;
+  /**
+   * @brief The array of the iterator names
+   */
+  char **nameArray;
+  /**
+   * @brief Dependencies hashtable
+   */
+  struct nlist *hashTable;
   /**
    * @brief The depth of the loop nest to collapse
    */

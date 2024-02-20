@@ -1,3 +1,4 @@
+int i, j, k, *A, *B, *C;
 #pragma scop
 for (i = 0; i < N - 1; i++)
 {
