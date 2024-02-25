@@ -1,19 +1,15 @@
 #!/bin/bash
-begin_string="#pragma trahrhe collapse("
-end_string="#pragma endtrahrhe"
+
+input_file="$1"
 exit_file="scoped_loop.c"
+collapse_count_file="collapse_count.txt"
 
-# get number of collapse loops
-nb_collapse=$(grep -oP '#pragma trahrhe collapse\(\K[0-9]+' "$1")
+cp "$input_file" "$exit_file"
 
-sed -i "s/${begin_string}[0-9]\+/$(echo ${begin_string}${nb_collapse})/g" "$1"
+sed -n 's/#pragma trahrhe collapse(\([0-9]\+\))/\1/p' "$input_file" > "$collapse_count_file"
 
-# get for loops
-extracted_loop=$(sed -n "/${begin_string}/,/${end_string}/{ /${begin_string}/! { /${end_string}/! p } }" "$1")
+sed -i 's/#pragma trahrhe collapse([0-9]\+)/#pragma scop/g' "$exit_file"
 
-# add scop and endscop
-scoped_loop=$(echo -e "#pragma scop\n${extracted_loop}\n#pragma endscop")
+sed -i 's/#pragma endtrahrhe/#pragma endscop/g' "$exit_file"
 
-echo "$scoped_loop" > "$exit_file"
-#echo "$nb_collapse"
 
