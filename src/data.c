@@ -125,9 +125,8 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
 
   // first elem of "string" is the outer loop var, elems are separated by commas
   // get first elem of "string" and store it in boundary->outerLoopVar
-  char *elemsOfString = strtok(string, ",");
-  boundary->outerLoopUpperBound = (char *)malloc(strlen(elemsOfString) * sizeof(char));
-  strcpy(boundary->outerLoopUpperBound, elemsOfString);
+  boundary->outerLoopVar = (char *)malloc(1024 * sizeof(char));
+  strcpy(boundary->outerLoopVar, string);
 
   strcat(unuaryUnion, string);
   strcat(unuaryUnion, "] -> { [");
@@ -149,6 +148,7 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
   }
 #pragma endregion
 
+#pragma region isl domain string generation
   boundary->iterationDomainsString = (char *)malloc(len * sizeof(char));
   strcpy(boundary->iterationDomainsString, unionList);
   strcat(unuaryUnion, unionList);
@@ -158,7 +158,6 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
 
   for (int depth = start_row; depth < statement->domain->nb_rows; depth++)
   {
-#pragma region isl domain string generation
     if (name_array == NULL)
       continue;
 
