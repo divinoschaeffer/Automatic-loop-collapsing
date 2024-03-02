@@ -110,6 +110,7 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
 
   string = osl_strings_sprint(names->parameters);
   size_t len = strcspn(string, "\n");
+  boundary->parametersCount = len;
 
   string[len] = '\0';
 
@@ -125,8 +126,8 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
 
   // first elem of "string" is the outer loop var, elems are separated by commas
   // get first elem of "string" and store it in boundary->outerLoopVar
-  boundary->outerLoopVar = (char *)malloc(1024 * sizeof(char));
-  strcpy(boundary->outerLoopVar, string);
+  boundary->outerLoopUpperBound = (char *)malloc(1024 * sizeof(char));
+  strcpy(boundary->outerLoopUpperBound, string);
 
   strcat(unuaryUnion, string);
   strcat(unuaryUnion, "] -> { [");
@@ -173,51 +174,6 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
     boundary->iteratorDependenciesArray[depth] = extractVariables(relation_buffer);
 #pragma endregion
 
-#pragma region iterators dependencies list building
-    // printf("Trying to build the dependencies list\n");
-    char *last_iterator_of_line = (char *)calloc(1024, sizeof(char));
-    unsigned max_k = 0;
-    printf("\n");
-
-    for (unsigned k = 0; k < statement->domain->nb_output_dims; k++)
-    {
-      printf("%s ", boundary->iteratorDependenciesArray[depth][k]);
-      if (strcmp(boundary->iteratorDependenciesArray[depth][k], "") != 0 && !digit_check(boundary->iteratorDependenciesArray[depth][k]))
-      {
-        last_iterator_of_line = boundary->iteratorDependenciesArray[depth][k];
-        max_k = k;
-
-        // printf("Last iterator: %s\n", last_iterator_of_line);
-      }
-    }
-
-    for (unsigned i = 0; i <= max_k; i++)
-    {
-      if (lookup(last_iterator_of_line) == NULL)
-      {
-        char *value = (char *)calloc(1024, sizeof(char));
-        if (strcmp(boundary->iteratorDependenciesArray[depth][i], last_iterator_of_line) != 0)
-          strcpy(value, boundary->iteratorDependenciesArray[depth][i]);
-        else
-          strcpy(value, "");
-
-        install(last_iterator_of_line, value);
-      }
-      else
-      {
-        char *value = (char *)calloc(1024, sizeof(char));
-        strcpy(value, lookup(last_iterator_of_line)->defn);
-
-        if (strcmp(boundary->iteratorDependenciesArray[depth][i], last_iterator_of_line) != 0)
-        {
-          strcat(value, ",");
-          strcat(value, boundary->iteratorDependenciesArray[depth][i]);
-        }
-
-        install(last_iterator_of_line, value);
-      }
-    }
-#pragma endregion
 #pragma region clean up dependencies array
 // for (int j = 0; j < MAX_VARIABLES; j++)
 // {
@@ -230,8 +186,6 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
 // }
 #pragma endregion
   }
-
-  print_hashtab();
 
   strcat(unuaryUnion, " }");
 

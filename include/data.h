@@ -76,6 +76,7 @@ struct boundary
    */
   char **nameArray;
   /**
+   * @deprecated
    * @brief Dependencies hashtable
    */
   struct nlist *hashTable;
@@ -87,6 +88,10 @@ struct boundary
    * @brief Next loop boundaries
    */
   struct boundary *next;
+  /**
+   * @brief The number of parameters
+   */
+  int parametersCount;
 };
 typedef struct boundary *TCD_Boundary;
 

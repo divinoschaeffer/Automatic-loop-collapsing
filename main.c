@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 
     /* Initialize */
     char *inputFilename = argv[1];
-    char *outputFilename = argc > 3 ? argv[3] : "out.c";
+    char *outputFilename = argc > 3 ? argv[3] : "out";
 
     initTcdFlow(inputFilename, outputFilename);
 
@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 #pragma region Step3
 
     /* Step 3: Generate header file */
-    // generateHeaderFile();
+    generateHeaderFile(boundaryList);
 
 #pragma endregion
 

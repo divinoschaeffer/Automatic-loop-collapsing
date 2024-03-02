@@ -19,17 +19,24 @@ write_init_section(TCD_Boundary boundary)
     char *outputString = (char *)malloc(1024 * sizeof(char));
 
     char *outer_var = boundary->outerLoopVar;
-    char *outer_var_bound = boundary->outerLoopUpperBound;
+    char *outer_var_bounds = boundary->outerLoopUpperBound;
     char *iteration_domains = boundary->iterationDomainsString;
     char **name_array = boundary->nameArray;
 
     outputString[0] = '\0';
 
     char *tmp = (char *)malloc(1024 * sizeof(char));
+    // include trahrhe header
+    char *header_file = (char *)malloc(1024 * sizeof(char));
+    strcpy(header_file, tcdFlowData->outputFile);
+    strcat(header_file, ".h");
+    sprintf(tmp, "#include \"%s\"\n\n", header_file);
+    strcat(outputString, tmp);
+
     sprintf(tmp, "unsigned pc_%d;\n", boundary_index);
     strcat(outputString, tmp);
     // we need to index ehrhart calls as they may be outer vars with the same name among different boundaries
-    sprintf(tmp, "unsigned upper_bound_%d = %s_Ehrhart%d(%s);\n", boundary_index, outer_var, boundary_index, outer_var_bound);
+    sprintf(tmp, "unsigned upper_bound_%d = Ehrhart%d(%s);\n", boundary_index, boundary_index, outer_var_bounds);
     strcat(outputString, tmp);
     sprintf(tmp, "unsigned first_iteration_%d = 1;\n", boundary_index);
     strcat(outputString, tmp);
@@ -49,24 +56,38 @@ write_init_section(TCD_Boundary boundary)
     while (curr_depth < max_depth)
     {
         // Construct variables on which the iteration variable depends
-        char *iterator_dependent_vars = (char *)malloc(1024 * sizeof(char));
+        char *vars = (char *)malloc(1024 * sizeof(char));
         char *tmp = (char *)malloc(1024 * sizeof(char));
-        sprintf(tmp, "pc_%d", boundary_index);
-        strcpy(iterator_dependent_vars, tmp);
-        strcat(iterator_dependent_vars, ",");
-        strcat(iterator_dependent_vars, outer_var_bound);
 
-        char *iterator = name_array[curr_depth + 1];
-        printf("[iterator] = %s --- ", iterator);
+        strcpy(tmp, outer_var_bounds);
+        sprintf(vars, "pc_%d", boundary_index);
 
-        if (strcmp(lookup(iterator)->defn, "") != 0)
+        // add iteration variables from start to curr_depth
+        for (int i = 0; i < curr_depth; i++)
         {
-            strcat(iterator_dependent_vars, ",");
-            strcat(iterator_dependent_vars, lookup(iterator)->defn);
+            strcat(vars, ",");
+            strcat(vars, name_array[i + 1]);
         }
-        printf("%s\n", lookup(iterator)->defn);
 
-        sprintf(tmp, "\t\t%s = %s_trahrhe%d(%s);\n", name_array[curr_depth + 1], name_array[curr_depth + 1], boundary_index, iterator_dependent_vars);
+        // take only first curr_depth parameters
+        char *token = strtok(tmp, ",");
+        int token_count = 0;
+        do
+        {
+            if (token_count <= curr_depth)
+            {
+                strcat(vars, ",");
+                strcat(vars, token);
+            }
+            else
+            {
+                break;
+            }
+            token_count++;
+            token = strtok(NULL, ",");
+        } while (token != NULL);
+
+        sprintf(tmp, "\t\t%s = trahrhe_%s%d(%s);\n", name_array[curr_depth + 1], name_array[curr_depth + 1], boundary_index, vars);
         strcat(outputString, tmp);
 
         curr_depth++;
@@ -77,6 +98,75 @@ write_init_section(TCD_Boundary boundary)
     strcat(outputString, "\t\n");
 
     free(tmp);
+
+    return outputString;
+}
+
+char *take(int index, char *string)
+{
+    char *tmp = (char *)malloc(1024 * sizeof(char));
+    strcpy(tmp, string);
+    char *token = strtok(tmp, ",");
+    for (int i = 0; i < index; i++)
+    {
+        token = strtok(NULL, ",");
+    }
+    return token;
+}
+
+void increment(int curr_depth, char *outer_var_bounds, char **name_array, char *outputString, struct clast_expr *stop_conditions[], CloogOptions *options)
+{
+    if (curr_depth == 0)
+    {
+        return;
+    }
+    // the innermost loop is incremented first, then when it reaches its upper bound, the next loop is incremented  etc.
+    char *tmp = (char *)malloc(1024 * sizeof(char));
+    strcat(outputString, "\n");
+    // sprintf(tmp, "\tif (%s >= %s)\n", name_array[curr_depth], take(curr_depth, outer_var_bounds));
+    FILE *tmpFile = fopen("tmp2.c", "w+");
+    if (tmpFile == NULL)
+    {
+        fprintf(stderr, "Error: Unable to open file tmp.c\n");
+        exit(EXIT_FAILURE);
+    }
+    clast_pprint_expr(options, tmpFile, stop_conditions[curr_depth - 1]);
+    fseek(tmpFile, 0, SEEK_END);
+    long fsize = ftell(tmpFile);
+    fseek(tmpFile, 0, SEEK_SET);
+    char *string = (char *)malloc(fsize + 1);
+    fread(string, 1, fsize, tmpFile);
+    fclose(tmpFile);
+    string[fsize] = 0;
+    tabString(tmpFile, string, fsize);
+    sprintf(tmp, "\tif (%s > %s)\n", name_array[curr_depth + 1], string);
+    // remove tmp2.c
+    remove("tmp2.c");
+    strcat(outputString, tmp);
+    strcat(outputString, "\t{\n");
+    sprintf(tmp, "\t\t%s++;\n", name_array[curr_depth]);
+    strcat(outputString, tmp);
+    sprintf(tmp, "\t\t%s = %s + 1;\n", name_array[curr_depth + 1], name_array[curr_depth]);
+    strcat(outputString, tmp);
+    increment(curr_depth - 1, outer_var_bounds, name_array, outputString, stop_conditions, options);
+    strcat(outputString, "\t}\n");
+    free(tmp);
+}
+
+char *
+write_increment_section(TCD_Boundary boundary, struct clast_expr *stop_conditions[], CloogOptions *options)
+{
+    char *outputString = (char *)malloc(1024 * sizeof(char));
+
+    char *outer_var = boundary->outerLoopVar;
+    char *outer_var_bounds = boundary->outerLoopUpperBound;
+    char *iteration_domains = boundary->iterationDomainsString;
+    char **name_array = boundary->nameArray;
+
+    outputString[0] = '\0';
+
+    int max_depth = 2;
+    increment(max_depth - 1, outer_var_bounds, name_array, outputString, stop_conditions, options);
 
     return outputString;
 }
@@ -99,6 +189,7 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
     // while we are have not hit the depth of parallelism of the boundary, we need to go deeper in the loop nest
     // int loop_nest_depth = boundary->depth;
     int loop_nest_depth = 2;
+    struct clast_expr *stop_conditions[loop_nest_depth];
     while (loop_nest_depth > 0)
     {
         if (CLAST_STMT_IS_A(root, stmt_root))
@@ -112,6 +203,7 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
         {
             struct clast_for *for_stmt = (struct clast_for *)root;
             root = for_stmt->body;
+            stop_conditions[loop_nest_depth - 1] = for_stmt->UB;
             loop_nest_depth--;
         }
         else if (CLAST_STMT_IS_A(root, stmt_block))
@@ -157,8 +249,9 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
 
     tabString(outputFile, string, fsize);
 
-    // Iteration code
-    // TODO: Insert the iteration code here
+    // Increment
+    char *increment = write_increment_section(boundary, stop_conditions, options);
+    fprintf(outputFile, "%s", increment);
 
     // Finalisation code
     fprintf(outputFile, "}\n\n");
@@ -180,11 +273,15 @@ void generateCode(TCD_BoundaryList boundaryList)
     options->scop = scop;
     options->compilable = 1;
 
-    FILE *outputFile = fopen(tcdFlowData->outputFile, "w+");
+    char *outputFilename = (char *)malloc(1024 * sizeof(char));
+    strcpy(outputFilename, tcdFlowData->outputFile);
+    strcat(outputFilename, ".c");
+
+    FILE *outputFile = fopen(outputFilename, "w+");
 
     if (outputFile == NULL)
     {
-        fprintf(stderr, "Error: Unable to open file %s\n", tcdFlowData->outputFile);
+        fprintf(stderr, "Error: Unable to open file %s\n", outputFilename);
         exit(EXIT_FAILURE);
     }
 
@@ -219,4 +316,69 @@ void generateCode(TCD_BoundaryList boundaryList)
     }
 
     fclose(outputFile);
+}
+
+void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile)
+{
+    char *isl_domain = boundary->firstIterDomainOfUnion->first->iterationDomain;
+
+    printf("isl_domain: %s\n", isl_domain);
+
+    char *bash_command = (char *)malloc(1024 * sizeof(char));
+    sprintf(bash_command, "cd trahrhe-4.1 && ./trahrhe -d\"%s\" -s\"%d\" -e", isl_domain, boundary_index);
+    // output file is trahrhe-4.1/trahrhe_header.h
+    FILE *tmp = fopen("tmp.sh", "w+");
+    if (tmp == NULL)
+    {
+        fprintf(stderr, "Error: Unable to open file tmp.sh\n");
+        exit(EXIT_FAILURE);
+    }
+    fprintf(tmp, "%s", bash_command);
+    fclose(tmp);
+    system("chmod +x tmp.sh && ./tmp.sh");
+    remove("tmp.sh");
+
+    FILE *headerFile = fopen("trahrhe-4.1/trahrhe_header.h", "r");
+    if (headerFile == NULL)
+    {
+        fprintf(stderr, "Error: Unable to open file trahrhe-4.1/trahrhe_header.h\n");
+        exit(EXIT_FAILURE);
+    }
+
+    fseek(headerFile, 0, SEEK_END);
+    long fsize = ftell(headerFile);
+    fseek(headerFile, 0, SEEK_SET);
+
+    char *string = (char *)malloc(fsize + 1);
+    fread(string, 1, fsize, headerFile);
+    fclose(headerFile);
+
+    string[fsize] = 0;
+
+    fprintf(outputFile, "%s", string);
+
+    remove("trahrhe-4.1/trahrhe_header.h");
+
+    free(bash_command);
+}
+
+void generateHeaderFile(TCD_BoundaryList boundaryList)
+{
+    char *headerFilename = (char *)malloc(1024 * sizeof(char));
+    strcpy(headerFilename, tcdFlowData->outputFile);
+    strcat(headerFilename, ".h");
+    FILE *outputFile = fopen(headerFilename, "w+");
+    if (outputFile == NULL)
+    {
+        fprintf(stderr, "Error: Unable to open file %s\n", headerFilename);
+        exit(EXIT_FAILURE);
+    }
+
+    TCD_Boundary boundary = boundaryList->first;
+    while (boundary != NULL)
+    {
+        generateBoundaryHeader(boundary, outputFile);
+
+        boundary = boundary->next;
+    }
 }

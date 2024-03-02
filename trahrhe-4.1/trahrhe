@@ -126,6 +126,8 @@ echo " "
 
 d_flag=''
 
+s_flag=''
+
 t_flag=''
 
 r_flag=''
@@ -138,7 +140,7 @@ m_flag=''
 h_flag=''
 
 # TODO: put space in getopts string?? Does it work?
-while getopts 'd:t:revpm:h' flag; do
+while getopts 'd:s:t:revpm:h' flag; do
     case "${flag}" in
     d) #### Main Domain stored in D and well-shaped by ISCC + multiplications with '*' ####
         D=$(echo "P:=${OPTARG};coalesce P;" | iscc | sed 's/\([ (+-][0-9][0-9]*\)\([A-Z_a-z]\)/\1\*\2/g')
@@ -147,6 +149,10 @@ while getopts 'd:t:revpm:h' flag; do
         if [[ ${Empty} == "{  :  }" ]]; then
           D="[NOT_A_PARAMETER]->${D}"
         fi
+        ;;
+
+    s) user_function_suffix="${OPTARG}"
+        s_flag='true'
         ;;
 
     t)
