@@ -8,12 +8,10 @@ for (pc_0 = 1; pc_0 <= upper_bound_0; pc_0++)
 	{
 		i = i_trahrhe0(pc_0,N);
 		j = j_trahrhe0(pc_0,N,i);
+		k = k_trahrhe0(pc_0,N,i,j);
 		first_iteration_0 = 0;
 	}
 	
-	for (k=0;k<=1;k++) {
-	  A[i][j] += B[k][i] * C[k][j];
-	}
-	A[j][i] = A[i][j];
+	A[i][j] += B[k][i] * C[k][j];
 }
 
