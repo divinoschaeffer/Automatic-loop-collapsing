@@ -21,4 +21,6 @@
  */
 void tabString(FILE *file, char *string, long fsize);
 
+int digit_check(char key[]);
+
 #endif

@@ -11,11 +11,22 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+#include <ctype.h>
 
 #include "flow.h"
+#include "hashtable.h"
+#include "format_helper.h"
 
+/**
+ * @brief Iteration domain representation
+ */
 struct iterationDomain
 {
+  /**
+   * @brief The iteration domain under the ISL format
+   * to pass to Trahrhe
+   */
   char *iterationDomain;
   struct iterationDomain *next;
 };
@@ -56,9 +67,31 @@ struct boundary
    */
   char *iterationDomainsString;
   /**
+   * @brief An array of string representing the list of dependencies
+   * of the iterators in the same order as the iterators in the domain
+   */
+  char ***iteratorDependenciesArray;
+  /**
+   * @brief The array of the iterator names
+   */
+  char **nameArray;
+  /**
+   * @deprecated
+   * @brief Dependencies hashtable
+   */
+  struct nlist *hashTable;
+  /**
+   * @brief The depth of the loop nest to collapse
+   */
+  int depth; // TODO: must be set while retrieving the scop directive from the trahrhe call
+  /**
    * @brief Next loop boundaries
    */
   struct boundary *next;
+  /**
+   * @brief The number of parameters
+   */
+  int parametersCount;
 };
 typedef struct boundary *TCD_Boundary;
 

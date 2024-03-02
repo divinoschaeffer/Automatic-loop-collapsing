@@ -62,7 +62,7 @@ generate_header() {
     fi
     vars=$(echo "${listevar[x]}" | sed 's/\([A-Za-z_][A-Za-z_0-9]*\)/long int \1/g')
     echo "/******************************** Ehrhart Polynomials ********************************/"
-    echo "static inline long int Ehrhart($parms) {"
+    echo "static inline long int Ehrhart$user_function_suffix($parms) {"
     echo " "
     cpt=1
     while ((cpt <= nehrhart[x])); do
@@ -97,13 +97,13 @@ generate_header() {
         echo "  fprintf(stderr,\"Error Ehrhart: no corresponding domain: (${Params[x]}) = ($format)\\n\",${Params[x]});"
     fi
     echo "  exit(1);"
-    echo "}  /* end Ehrhart */"
+    echo "}  /* end Ehrhart$user_function_suffix */"
     echo " "
     echo "/******************************** Ranking Polynomials ********************************/"
     if [[ "${parms}" == "" ]]; then
-        echo "static inline long int Ranking($vars) {"
+        echo "static inline long int Ranking$user_function_suffix($vars) {"
     else
-        echo "static inline long int Ranking($vars,$parms) {"
+        echo "static inline long int Ranking$user_function_suffix($vars,$parms) {"
     fi
     echo " "
     cpt=1
@@ -135,17 +135,17 @@ generate_header() {
         echo "  fprintf(stderr,\"Error Ranking: no corresponding domain: (${listevar[x]}, ${Params[x]}) = ($format)\\n\",${listevar[x]},${Params[x]});"
     fi
     echo "  exit(1);"
-    echo "} /* end Ranking */"
+    echo "} /* end Ranking$user_function_suffix */"
 
     echo " "
     echo "/******************************** PCMin ********************************/"
     cpt=1
     while ((cpt <= nsol[x])); do
-        echo "/******************************** PCMin_$cpt ********************************/"
+        echo "/******************************** PCMin_$cpt$user_function_suffix ********************************/"
         if [[ "${parms}" == "" ]]; then
-            echo "static inline long int PCMin_$cpt() {"
+            echo "static inline long int PCMin_$cpt$user_function_suffix() {"
         else
-            echo "static inline long int PCMin_$cpt($parms) {"
+            echo "static inline long int PCMin_$cpt$user_function_suffix($parms) {"
         fi
         npc=1
         while ((npc <= NPCMIN[x$cpt])); do
@@ -169,7 +169,7 @@ generate_header() {
             ((npc++))
         done
         if (echo "${Params[x]}" | grep -v -q "NOT_A_PARAMETER"); then
-            echo "  return Ehrhart(${Params[x]});"
+            echo "  return Ehrhart$user_function_suffix(${Params[x]});"
         fi
         #IFS=","
         #set - ${Params[x]}
@@ -182,7 +182,7 @@ generate_header() {
         #done
         #echo "  fprintf(stderr,\"Error PCMin_$cpt: domain not corresponding: (${Params[x]}) = ($format)\\n\",${Params[x]});"
         #echo "  exit(1);"
-        echo "} /* end PCMin_$cpt */"
+        echo "} /* end PCMin_$cpt$user_function_suffix */"
         echo " "
         ((cpt++))
     done
@@ -190,11 +190,11 @@ generate_header() {
     echo "/******************************** PCMax ********************************/"
     cpt=1
     while ((cpt <= nsol[x])); do
-        echo "/******************************** PCMax_$cpt ********************************/"
+        echo "/******************************** PCMax_$cpt$user_function_suffix ********************************/"
         if [[ "${parms}" == "" ]]; then
-            echo "static inline long int PCMax_$cpt() {"
+            echo "static inline long int PCMax_$cpt$user_function_suffix() {"
         else
-            echo "static inline long int PCMax_$cpt($parms) {"
+            echo "static inline long int PCMax_$cpt$user_function_suffix($parms) {"
         fi
         npc=1
         while ((npc <= NPCMAX[x$cpt])); do
@@ -220,7 +220,7 @@ generate_header() {
         echo "  return 0;"
         #echo "  fprintf(stderr,\"Error PCMax_$cpt: domain not corresponding: (${Params[x]}) = ($format)\\n\",${Params[x]});"
         #echo "  exit(1);"
-        echo "} /* end PCMax_$cpt */"
+        echo "} /* end PCMax_$cpt$user_function_suffix */"
         echo " "
         ((cpt++))
     done
@@ -256,7 +256,7 @@ generate_header() {
         # variables in VAR[*] are not in the correct order. Below is a hack (does it always work?)
         var="${VAR[${CVAR}${dim}]}"
 
-        echo "/******************************** trahrhe_$var ********************************/"
+        echo "/******************************** trahrhe_$var$user_function_suffix ********************************/"
         if [[ "${masque:$((dim - 1)):1}" =~ [DG] ]]; then
             echo "long int trahrhe_${var}_last_pc = -1;"
             for (( d = 1; d < $dim; d++ )); do
@@ -281,9 +281,9 @@ generate_header() {
         fi
         if ((dim > 1)); then
             if [[ "${parms}" == "" ]]; then
-              echo "static inline long int trahrhe_$var(long int pc, $vars) {"
+              echo "static inline long int trahrhe_$var$user_function_suffix(long int pc, $vars) {"
             else
-              echo "static inline long int trahrhe_$var(long int pc, $vars, $parms) {"
+              echo "static inline long int trahrhe_$var$user_function_suffix(long int pc, $vars, $parms) {"
             fi
             IFS=","
             set - $(echo "${listevar1[x11$((dim - 1))]},${Params[x]}")
@@ -299,9 +299,9 @@ generate_header() {
             done
         else
             if [[ "${parms}" == "" ]]; then
-                echo "static inline long int trahrhe_$var(long int pc) {"
+                echo "static inline long int trahrhe_$var$user_function_suffix(long int pc) {"
             else
-                echo "static inline long int trahrhe_$var(long int pc, $parms) {"
+                echo "static inline long int trahrhe_$var$user_function_suffix(long int pc, $parms) {"
             fi
             IFS=","
             set - ${Params[x]}
@@ -322,7 +322,7 @@ generate_header() {
             ### "Ranking(m, lexmin_j(m), lexmin_k(m,lexmin_j(m)), ..., PARAMS)" ###
             typeset -A ranking_call_str
             for v in m "$var" "$var+1"; do
-                ranking_call_str[$v]="Ranking("
+                ranking_call_str[$v]="Ranking$user_function_suffix("
                 if (( dim > 1 )); then
                     ranking_call_str[$v]+="${listevar1[${CVAR}11$((dim - 1))]}, "
                 fi
@@ -430,16 +430,16 @@ generate_header() {
                                     condition=$(echo "${trans};" | "$D2C")
                                     echo " "
                                     if (echo "${Params[x]}" | grep -q "NOT_A_PARAMETER"); then
-                                        echo "  if ( $condition && (PCMin_$cpt() <= pc) && (pc <= PCMax_$cpt()) ) {"
+                                        echo "  if ( $condition && (PCMin_$cpt$user_function_suffix() <= pc) && (pc <= PCMax_$cpt$user_function_suffix()) ) {"
                                     else
-                                        echo "  if ( $condition && (PCMin_$cpt(${Params[x]}) <= pc) && (pc <= PCMax_$cpt(${Params[x]})) ) {"
+                                        echo "  if ( $condition && (PCMin_$cpt$user_function_suffix(${Params[x]}) <= pc) && (pc <= PCMax_$cpt$user_function_suffix(${Params[x]})) ) {"
                                     fi
                                 else
                                     echo " "
                                     if (echo "${Params[x]}" | grep -q "NOT_A_PARAMETER"); then
-                                        echo "  if ( (PCMin_$cpt() <= pc) && (pc <= PCMax_$cpt()) ) {"
+                                        echo "  if ( (PCMin_$cpt$user_function_suffix() <= pc) && (pc <= PCMax_$cpt$user_function_suffix()) ) {"
                                     else
-                                        echo "  if ( (PCMin_$cpt(${Params[x]}) <= pc) && (pc <= PCMax_$cpt(${Params[x]})) ) {"
+                                        echo "  if ( (PCMin_$cpt$user_function_suffix(${Params[x]}) <= pc) && (pc <= PCMax_$cpt$user_function_suffix(${Params[x]})) ) {"
                                     fi
                                 fi
                                 echo " "
@@ -456,16 +456,16 @@ generate_header() {
                                         condition=$(echo "${trans};" | "$D2C")
                                         echo " "
                                         if (echo "${Params[x]}" | grep -q "NOT_A_PARAMETER"); then
-                                            echo "  if ( $condition && (PCMin_$cpt() <= pc) && (pc <= PCMax_$cpt()) ) {"
+                                            echo "  if ( $condition && (PCMin_$cpt$user_function_suffix() <= pc) && (pc <= PCMax_$cpt$user_function_suffix()) ) {"
                                         else
-                                            echo "  if ( $condition && (PCMin_$cpt(${Params[x]}) <= pc) && (pc <= PCMax_$cpt(${Params[x]})) ) {"
+                                            echo "  if ( $condition && (PCMin_$cpt$user_function_suffix(${Params[x]}) <= pc) && (pc <= PCMax_$cpt$user_function_suffix(${Params[x]})) ) {"
                                         fi
                                     else
                                         echo " "
                                         if (echo "${Params[x]}" | grep -q "NOT_A_PARAMETER"); then
-                                            echo "  if ( (PCMin_$cpt() <= pc) && (pc <= PCMax_$cpt()) ) {"
+                                            echo "  if ( (PCMin_$cpt$user_function_suffix() <= pc) && (pc <= PCMax_$cpt$user_function_suffix()) ) {"
                                         else
-                                            echo "  if ( (PCMin_$cpt(${Params[x]}) <= pc) && (pc <= PCMax_$cpt(${Params[x]})) ) {"
+                                            echo "  if ( (PCMin_$cpt$user_function_suffix(${Params[x]}) <= pc) && (pc <= PCMax_$cpt$user_function_suffix(${Params[x]})) ) {"
                                         fi
                                     fi
                                     echo " "
@@ -511,9 +511,9 @@ generate_header() {
                             cible="${listevar1[x11$((dim - 1))]},$var[i]"
                         fi
                         if (echo "${Params[x]}" | grep -q "NOT_A_PARAMETER"); then
-                            echo "        rank[i] = Ranking(${cible});"
+                            echo "        rank[i] = Ranking$user_function_suffix(${cible});"
                         else
-                            echo "        rank[i] = Ranking(${cible},${Params[x]});"
+                            echo "        rank[i] = Ranking$user_function_suffix(${cible},${Params[x]});"
                         fi
 
                     done # for ((Period=1 ; $(( NPeriod[${cpt}]+1 )) - ${Period} ; Period++))
@@ -541,16 +541,16 @@ generate_header() {
                                     condition=$(echo "${trans};" | "$D2C")
                                     echo " "
                                     if (echo "${Params[x]}" | grep -q "NOT_A_PARAMETER"); then
-                                        echo "  if ( $condition && (PCMin_$cpt() <= pc) && (pc <= PCMax_$cpt()) ) {"
+                                        echo "  if ( $condition && (PCMin_$cpt$user_function_suffix() <= pc) && (pc <= PCMax_$cpt$user_function_suffix()) ) {"
                                     else
-                                        echo "  if ( $condition && (PCMin_$cpt(${Params[x]}) <= pc) && (pc <= PCMax_$cpt(${Params[x]})) ) {"
+                                        echo "  if ( $condition && (PCMin_$cpt$user_function_suffix(${Params[x]}) <= pc) && (pc <= PCMax_$cpt$user_function_suffix(${Params[x]})) ) {"
                                     fi
                                 else
                                     echo " "
                                     if (echo "${Params[x]}" | grep -q "NOT_A_PARAMETER"); then
-                                        echo "  if ( (PCMin_$cpt() <= pc) && (pc <= PCMax_$cpt()) ) {"
+                                        echo "  if ( (PCMin_$cpt$user_function_suffix() <= pc) && (pc <= PCMax_$cpt$user_function_suffix()) ) {"
                                     else
-                                        echo "  if ( (PCMin_$cpt(${Params[x]}) <= pc) && (pc <= PCMax_$cpt(${Params[x]})) ) {"
+                                        echo "  if ( (PCMin_$cpt$user_function_suffix(${Params[x]}) <= pc) && (pc <= PCMax_$cpt$user_function_suffix(${Params[x]})) ) {"
                                     fi
                                 fi
                             else
@@ -562,16 +562,16 @@ generate_header() {
                                     condition=$(echo "${trans};" | "$D2C")
                                     echo " "
                                     if (echo "${Params[x]}" | grep -q "NOT_A_PARAMETER"); then
-                                        echo "  if ( $condition && (PCMin_$cpt() <= pc) && (pc <= PCMax_$cpt()) ) {"
+                                        echo "  if ( $condition && (PCMin_$cpt$user_function_suffix() <= pc) && (pc <= PCMax_$cpt$user_function_suffix()) ) {"
                                     else
-                                        echo "  if ( $condition && (PCMin_$cpt(${Params[x]}) <= pc) && (pc <= PCMax_$cpt(${Params[x]})) ) {"
+                                        echo "  if ( $condition && (PCMin_$cpt$user_function_suffix(${Params[x]}) <= pc) && (pc <= PCMax_$cpt$user_function_suffix(${Params[x]})) ) {"
                                     fi
                                 else
                                     echo " "
                                     if (echo "${Params[x]}" | grep -q "NOT_A_PARAMETER"); then
-                                    echo "  if ( (PCMin_$cpt() <= pc) && (pc <= PCMax_$cpt()) ) {"
+                                    echo "  if ( (PCMin_$cpt$user_function_suffix() <= pc) && (pc <= PCMax_$cpt$user_function_suffix()) ) {"
                                     else
-                                    echo "  if ( (PCMin_$cpt(${Params[x]}) <= pc) && (pc <= PCMax_$cpt(${Params[x]})) ) {"
+                                    echo "  if ( (PCMin_$cpt$user_function_suffix(${Params[x]}) <= pc) && (pc <= PCMax_$cpt$user_function_suffix(${Params[x]})) ) {"
                                     fi
                                 fi
                             fi
@@ -609,16 +609,16 @@ generate_header() {
                                         condition=$(echo "${trans};" | "$D2C")
                                         echo " "
                                         if (echo "${Params[x]}" | grep -q "NOT_A_PARAMETER"); then
-                                            echo "  if ( $condition && (PCMin_$cpt() <= pc) && (pc <= PCMax_$cpt()) ) {"
+                                            echo "  if ( $condition && (PCMin_$cpt$user_function_suffix() <= pc) && (pc <= PCMax_$cpt$user_function_suffix()) ) {"
                                         else
-                                            echo "  if ( $condition && (PCMin_$cpt(${Params[x]}) <= pc) && (pc <= PCMax_$cpt(${Params[x]})) ) {"
+                                            echo "  if ( $condition && (PCMin_$cpt$user_function_suffix(${Params[x]}) <= pc) && (pc <= PCMax_$cpt$user_function_suffix(${Params[x]})) ) {"
                                         fi
                                     else
                                         echo " "
                                         if (echo "${Params[x]}" | grep -q "NOT_A_PARAMETER"); then
-                                            echo "  if ( (PCMin_$cpt() <= pc) && (pc <= PCMax_$cpt()) ) {"
+                                            echo "  if ( (PCMin_$cpt$user_function_suffix() <= pc) && (pc <= PCMax_$cpt$user_function_suffix()) ) {"
                                         else
-                                            echo "  if ( (PCMin_$cpt(${Params[x]}) <= pc) && (pc <= PCMax_$cpt(${Params[x]})) ) {"
+                                            echo "  if ( (PCMin_$cpt$user_function_suffix(${Params[x]}) <= pc) && (pc <= PCMax_$cpt$user_function_suffix(${Params[x]})) ) {"
                                         fi
                                     fi
                                 else
@@ -630,16 +630,16 @@ generate_header() {
                                         condition=$(echo "${trans};" | "$D2C")
                                         echo " "
                                         if (echo "${Params[x]}" | grep -q "NOT_A_PARAMETER"); then
-                                            echo "  if ( $condition && (PCMin_$cpt() <= pc) && (pc <= PCMax_$cpt()) ) {"
+                                            echo "  if ( $condition && (PCMin_$cpt$user_function_suffix() <= pc) && (pc <= PCMax_$cpt$user_function_suffix()) ) {"
                                         else
-                                            echo "  if ( $condition && (PCMin_$cpt(${Params[x]}) <= pc) && (pc <= PCMax_$cpt(${Params[x]})) ) {"
+                                            echo "  if ( $condition && (PCMin_$cpt$user_function_suffix(${Params[x]}) <= pc) && (pc <= PCMax_$cpt$user_function_suffix(${Params[x]})) ) {"
                                         fi
                                     else
                                         echo " "
                                         if (echo "${Params[x]}" | grep -q "NOT_A_PARAMETER"); then
-                                            echo "  if ( (PCMin_$cpt() <= pc) && (pc <= PCMax_$cpt()) ) {"
+                                            echo "  if ( (PCMin_$cpt$user_function_suffix() <= pc) && (pc <= PCMax_$cpt$user_function_suffix()) ) {"
                                         else
-                                            echo "  if ( (PCMin_$cpt(${Params[x]}) <= pc) && (pc <= PCMax_$cpt(${Params[x]})) ) {"
+                                            echo "  if ( (PCMin_$cpt$user_function_suffix(${Params[x]}) <= pc) && (pc <= PCMax_$cpt$user_function_suffix(${Params[x]})) ) {"
                                         fi
                                     fi
                                 fi
@@ -675,21 +675,21 @@ generate_header() {
             echo " "
             if ((dim > 1)); then
                 if (echo "${Params[x]}" | grep -q "NOT_A_PARAMETER"); then
-                    echo "  fprintf(stderr,\"Error trahrhe_$var: no corresponding domain: (pc, ${listevar1[x11$((dim - 1))]}) = (%ld,$format)\\n\",pc,${listevar1[x11$((dim - 1))]});"
+                    echo "  fprintf(stderr,\"Error trahrhe_$var$user_function_suffix: no corresponding domain: (pc, ${listevar1[x11$((dim - 1))]}) = (%ld,$format)\\n\",pc,${listevar1[x11$((dim - 1))]});"
                 else
-                    echo "  fprintf(stderr,\"Error trahrhe_$var: no corresponding domain: (pc, ${listevar1[x11$((dim - 1))]}, ${Params[x]}) = (%ld,$format)\\n\",pc,${listevar1[x11$((dim - 1))]},${Params[x]});"
+                    echo "  fprintf(stderr,\"Error trahrhe_$var$user_function_suffix: no corresponding domain: (pc, ${listevar1[x11$((dim - 1))]}, ${Params[x]}) = (%ld,$format)\\n\",pc,${listevar1[x11$((dim - 1))]},${Params[x]});"
                 fi
             else
                 if (echo "${Params[x]}" | grep -q "NOT_A_PARAMETER"); then
-                    echo "  fprintf(stderr,\"Error trahrhe_$var: no corresponding domain: (pc) = (%ld)\\n\",pc);"
+                    echo "  fprintf(stderr,\"Error trahrhe_$var$user_function_suffix: no corresponding domain: (pc) = (%ld)\\n\",pc);"
                 else
-                    echo "  fprintf(stderr,\"Error trahrhe_$var: no corresponding domain: (pc, ${Params[x]}) = (%ld,$format)\\n\",pc,${Params[x]});"
+                    echo "  fprintf(stderr,\"Error trahrhe_$var$user_function_suffix: no corresponding domain: (pc, ${Params[x]}) = (%ld,$format)\\n\",pc,${Params[x]});"
                 fi
             fi
             echo "  exit(1);"
         fi
 
-        echo "} /* end trahrhe_$var */"
+        echo "} /* end trahrhe_$var$user_function_suffix */"
         echo " "
         ((dim++))
     done

@@ -22,3 +22,15 @@ void tabString(FILE *file, char *string, long fsize)
 
     fprintf(file, "%s", tabbedString);
 }
+
+int digit_check(char key[])
+{
+    for (int i = 0; i < strlen(key); i++)
+    {
+        if (!(key[i] >= '0' && key[i] <= '9'))
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
