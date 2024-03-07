@@ -114,7 +114,13 @@ char *take(int index, char *string)
     return token;
 }
 
-void increment(int curr_depth, char *outer_var_bounds, char **name_array, char *outputString, struct clast_expr *stop_conditions[], CloogOptions *options)
+void increment(int curr_depth,
+               char *outer_var_bounds,
+               char **name_array,
+               char *outputString,
+               struct clast_expr *stop_conditions[],
+               int *stop_conditions_int,
+               CloogOptions *options)
 {
     if (curr_depth == 0)
     {
@@ -139,22 +145,36 @@ void increment(int curr_depth, char *outer_var_bounds, char **name_array, char *
     fclose(tmpFile);
     string[fsize] = 0;
     tabString(tmpFile, string, fsize);
-    sprintf(tmp, "\tif (%s > %s)\n", name_array[curr_depth + 1], string);
+    if (stop_conditions_int[curr_depth - 1] == 0)
+    {
+        sprintf(tmp, "\tif (%s > %s)\n", name_array[curr_depth + 1], string);
+    }
+    else
+    {
+        sprintf(tmp, "\tif (%s < %s)\n", name_array[curr_depth + 1], string);
+    }
     // remove tmp2.c
     remove("tmp2.c");
     strcat(outputString, tmp);
     strcat(outputString, "\t{\n");
     sprintf(tmp, "\t\t%s++;\n", name_array[curr_depth]);
     strcat(outputString, tmp);
-    sprintf(tmp, "\t\t%s = %s + 1;\n", name_array[curr_depth + 1], name_array[curr_depth]);
+    if (stop_conditions_int[curr_depth - 1] == 0)
+    {
+        sprintf(tmp, "\t\t%s = %s - 1;\n", name_array[curr_depth + 1], name_array[curr_depth]);
+    }
+    else
+    {
+        sprintf(tmp, "\t\t%s = %s + 1;\n", name_array[curr_depth + 1], name_array[curr_depth]);
+    }
     strcat(outputString, tmp);
-    increment(curr_depth - 1, outer_var_bounds, name_array, outputString, stop_conditions, options);
+    increment(curr_depth - 1, outer_var_bounds, name_array, outputString, stop_conditions, stop_conditions_int, options);
     strcat(outputString, "\t}\n");
     free(tmp);
 }
 
 char *
-write_increment_section(TCD_Boundary boundary, struct clast_expr *stop_conditions[], CloogOptions *options)
+write_increment_section(TCD_Boundary boundary, struct clast_expr *stop_conditions[], int *stop_conditions_int, CloogOptions *options)
 {
     char *outputString = (char *)malloc(1024 * sizeof(char));
 
@@ -166,7 +186,8 @@ write_increment_section(TCD_Boundary boundary, struct clast_expr *stop_condition
     outputString[0] = '\0';
 
     int max_depth = 2;
-    increment(max_depth - 1, outer_var_bounds, name_array, outputString, stop_conditions, options);
+    sprintf(outputString, "\n\t%s++;", name_array[max_depth]);
+    increment(max_depth - 1, outer_var_bounds, name_array, outputString, stop_conditions, stop_conditions_int, options);
 
     return outputString;
 }
@@ -190,6 +211,7 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
     // int loop_nest_depth = boundary->depth;
     int loop_nest_depth = 2;
     struct clast_expr *stop_conditions[loop_nest_depth];
+    int *stop_conditions_int = (int *)malloc(loop_nest_depth * sizeof(int));
     while (loop_nest_depth > 0)
     {
         if (CLAST_STMT_IS_A(root, stmt_root))
@@ -203,7 +225,16 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
         {
             struct clast_for *for_stmt = (struct clast_for *)root;
             root = for_stmt->body;
-            stop_conditions[loop_nest_depth - 1] = for_stmt->UB;
+            if (for_stmt->UB != NULL)
+            {
+                stop_conditions[loop_nest_depth - 1] = for_stmt->UB;
+                stop_conditions_int[loop_nest_depth - 1] = 1;
+            }
+            else
+            {
+                stop_conditions[loop_nest_depth - 1] = for_stmt->LB;
+                stop_conditions_int[loop_nest_depth - 1] = 0;
+            }
             loop_nest_depth--;
         }
         else if (CLAST_STMT_IS_A(root, stmt_block))
@@ -250,7 +281,7 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
     tabString(outputFile, string, fsize);
 
     // Increment
-    char *increment = write_increment_section(boundary, stop_conditions, options);
+    char *increment = write_increment_section(boundary, stop_conditions, stop_conditions_int, options);
     fprintf(outputFile, "%s", increment);
 
     // Finalisation code

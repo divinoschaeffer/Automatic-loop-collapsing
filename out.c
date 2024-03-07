@@ -18,7 +18,8 @@ for (pc_0 = 1; pc_0 <= upper_bound_0; pc_0++)
 	}
 	A[j][i] = A[i][j];
 
-	if (j > N-1)
+	j++;
+	if (j < N-1)
 	{
 		i++;
 		j = i + 1;
