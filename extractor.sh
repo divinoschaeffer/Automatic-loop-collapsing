@@ -1,8 +1,8 @@
 #!/bin/bash
 
 input_file="$1"
-exit_file="scoped_loop.c"
-collapse_count_file="collapse_count.txt"
+exit_file="$2"
+collapse_count_file="$3"
 
 cp "$input_file" "$exit_file"
 
