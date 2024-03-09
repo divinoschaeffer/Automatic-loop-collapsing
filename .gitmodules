@@ -10,3 +10,6 @@
 [submodule "ntl"]
 	path = ntl
 	url = https://github.com/libntl/ntl.git
+[submodule "isl"]
+	path = isl
+	url = https://repo.or.cz/isl.git
