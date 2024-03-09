@@ -30,6 +30,11 @@ typedef struct
     char *outputFile;
 
     /**
+     * @brief Collapse parameters.
+     */
+    int *collapseParameters;
+
+    /**
      * @brief Pointer on the current polyedral representation of the source code.
      */
     osl_scop_p scop;
