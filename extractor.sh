@@ -11,5 +11,3 @@ sed -n 's/#pragma trahrhe collapse(\([0-9]\+\))/\1/p' "$input_file" > "$collapse
 sed -i 's/#pragma trahrhe collapse([0-9]\+)/#pragma scop/g' "$exit_file"
 
 sed -i 's/#pragma endtrahrhe/#pragma endscop/g' "$exit_file"
-
-
