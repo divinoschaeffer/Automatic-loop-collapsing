@@ -1,6 +1,32 @@
 #include "data.h"
+#define MAX_VARIABLES 20
 
 extern TCD_FlowData *tcdFlowData;
+
+/**
+ * @brief given an operation as a string
+ * returns the variable names in the operation
+ * @param operation
+ * @return char**
+ */
+char **extractVariables(char *operation)
+{
+  char **variables = (char **)malloc(MAX_VARIABLES * sizeof(char *));
+  for (int i = 0; i < MAX_VARIABLES; i++)
+  {
+    variables[i] = (char *)calloc(1024, sizeof(char));
+  }
+
+  int i = 0;
+  char *token = strtok(operation, "+-*/");
+  while (token != NULL)
+  {
+    strcpy(variables[i], token);
+    token = strtok(NULL, "+-*/");
+    i++;
+  }
+  return variables;
+}
 
 TCD_IterationDomain copyIterationDomain(TCD_IterationDomain original)
 {
@@ -49,108 +75,152 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
   nb_parts = osl_relation_nb_components(statement->domain);
   is_access_array = (statement->domain->type == OSL_TYPE_READ || statement->domain->type == OSL_TYPE_WRITE ? 1 : 0);
 
-  // Print each part of the union.
-  for (part = 1; part <= nb_parts; part++)
+  if (nb_parts > 1)
   {
-    index_output_dims = 1;
-    index_input_dims = index_output_dims + statement->domain->nb_output_dims;
-    index_params = index_input_dims + statement->domain->nb_input_dims;
-
-    // Prepare the array of strings for comments.
-    name_array = osl_relation_strings(statement->domain, names);
-
-    if (!is_access_array)
-    {
-      start_row = 0;
-    }
-    else
-    {
-      if (statement->domain->nb_rows == 1) // for non array variables
-        start_row = 0;
-      else // Remove the 'Arr' line
-        start_row = 1;
-    }
-    // Print the array
-
-    // Initialize unuaryUnion
-    char *unuaryUnion = (char *)malloc(statement->domain->nb_rows * (OSL_MAX_STRING + 1) * sizeof(char));
-    char *unionList = (char *)malloc((OSL_MAX_STRING + 1) * sizeof(char));
-    strcpy(unionList, "");
-    strcpy(unuaryUnion, "[");
-    char *string;
-
-    string = osl_strings_sprint(names->parameters);
-    size_t len = strcspn(string, "\n");
-
-    string[len] = '\0';
-
-    // replace string spaces with commas
-    for (i = 0; i < len; i++)
-    {
-      if (string[i] == ' ')
-        string[i] = ',';
-    }
-
-    strcat(unuaryUnion, string);
-    strcat(unuaryUnion, "] -> { [");
-
-    for (int _i = 1; _i <= statement->domain->nb_output_dims; _i++)
-    {
-      if (name_array != NULL)
-      {
-        strcat(unionList, name_array[_i]);
-        if (_i != statement->domain->nb_output_dims)
-          strcat(unionList, ",");
-      }
-    }
-
-    strcat(unuaryUnion, unionList);
-    strcat(unuaryUnion, "] : ");
-
-    for (i = start_row; i < statement->domain->nb_rows; i++)
-    {
-      if (name_array != NULL)
-      {
-        char *equation_inequation_builder_buffer = (char *)malloc(sizeof(char));
-        sprintf(equation_inequation_builder_buffer, "%s >= 0", osl_relation_expression(statement->domain, i, name_array));
-        strcat(unuaryUnion, equation_inequation_builder_buffer);
-        if (i != statement->domain->nb_rows - 1)
-          strcat(unuaryUnion, " and ");
-      }
-    }
-
-    strcat(unuaryUnion, " }");
-
-    TCD_IterationDomain iterationDomainsUnion = (TCD_IterationDomain)malloc(sizeof(struct iterationDomain));
-    iterationDomainsUnion->next = NULL;
-    iterationDomainsUnion->iterationDomain = (char *)malloc(statement->domain->nb_rows * (OSL_MAX_STRING + 1) * sizeof(char));
-    strcpy(iterationDomainsUnion->iterationDomain, unuaryUnion);
-
-    // Free the array of strings.
-    if (name_array != NULL)
-    {
-      for (i = 0; i < statement->domain->nb_columns; i++)
-        free(name_array[i]);
-      free(name_array);
-    }
-    free(unionList);
-    free(unuaryUnion);
-
-    if (boundary->firstIterDomainOfUnion->first == NULL)
-    {
-      boundary->firstIterDomainOfUnion->first = iterationDomainsUnion;
-    }
-    else
-    {
-      TCD_IterationDomain current = boundary->firstIterDomainOfUnion->first;
-      while (current->next != NULL)
-      {
-        current = current->next;
-      }
-      current->next = iterationDomainsUnion;
-    }
-    statement->domain = statement->domain->next;
+    fprintf(stderr, "Error: the domain has %d parts, but only one is expected.\n", nb_parts);
+    exit(EXIT_FAILURE);
   }
+#pragma region osl stuff init
+  index_output_dims = 1;
+  index_input_dims = index_output_dims + statement->domain->nb_output_dims;
+  index_params = index_input_dims + statement->domain->nb_input_dims;
+
+  // Prepare the array of strings for comments.
+  name_array = osl_relation_strings(statement->domain, names);
+
+  if (!is_access_array)
+  {
+    start_row = 0;
+  }
+  else
+  {
+    if (statement->domain->nb_rows == 1) // for non array variables
+      start_row = 0;
+    else // Remove the 'Arr' line
+      start_row = 1;
+  }
+#pragma endregion
+#pragma region unuaryUnion init stuff
+  // Initialize unuaryUnion
+  char *unuaryUnion = (char *)malloc(statement->domain->nb_rows * 2 * (OSL_MAX_STRING + 1) * sizeof(char));
+  char *unionList = (char *)malloc((OSL_MAX_STRING + 1) * sizeof(char));
+  strcpy(unionList, "");
+  strcpy(unuaryUnion, "[");
+  char *string;
+
+  string = osl_strings_sprint(names->parameters);
+  size_t len = strcspn(string, "\n");
+  boundary->parametersCount = len;
+
+  string[len] = '\0';
+
+  // replace string spaces with commas
+  for (i = 0; i < len; i++)
+  {
+    if (string[i] == ' ')
+    {
+      string[i] = ',';
+    }
+  }
+#pragma endregion
+
+  // first elem of "string" is the outer loop var, elems are separated by commas
+  // get first elem of "string" and store it in boundary->outerLoopVar
+  boundary->outerLoopUpperBound = (char *)malloc(1024 * sizeof(char));
+  strcpy(boundary->outerLoopUpperBound, string);
+
+  strcat(unuaryUnion, string);
+  strcat(unuaryUnion, "] -> { [");
+
+#pragma region output_dims
+  for (int _i = 1; _i <= statement->domain->nb_output_dims; _i++)
+  {
+    if (name_array == NULL)
+      continue;
+
+    strcat(unionList, name_array[_i]);
+    if (_i != statement->domain->nb_output_dims)
+      strcat(unionList, ",");
+    if (_i == 1)
+    {
+      boundary->outerLoopVar = (char *)malloc(strlen(name_array[_i]) * sizeof(char));
+      strcpy(boundary->outerLoopVar, name_array[_i]);
+    }
+  }
+#pragma endregion
+
+#pragma region isl domain string generation
+  boundary->iterationDomainsString = (char *)malloc(len * sizeof(char));
+  strcpy(boundary->iterationDomainsString, unionList);
+  strcat(unuaryUnion, unionList);
+  strcat(unuaryUnion, "] : ");
+
+  boundary->iteratorDependenciesArray = (char ***)malloc(sizeof(char *));
+
+  for (int depth = start_row; depth < statement->domain->nb_rows; depth++)
+  {
+    if (name_array == NULL)
+      continue;
+
+    char *relation_buffer = (char *)malloc(sizeof(char));
+    sprintf(relation_buffer, "%s", osl_relation_expression(statement->domain, depth, name_array));
+
+    strcat(unuaryUnion, relation_buffer);
+    strcat(unuaryUnion, " >= 0");
+    if (depth != statement->domain->nb_rows - 1)
+      strcat(unuaryUnion, " and ");
+
+    boundary->iteratorDependenciesArray[depth] = (char **)calloc(statement->domain->nb_rows, sizeof(char *));
+    boundary->iteratorDependenciesArray[depth] = extractVariables(relation_buffer);
+#pragma endregion
+
+#pragma region clean up dependencies array
+// for (int j = 0; j < MAX_VARIABLES; j++)
+// {
+//   if (strcmp(boundary->iteratorDependenciesArray[depth][j], "") == 0)
+//     break;
+//   if (strcmp(boundary->iteratorDependenciesArray[depth][j], iterators[0]) != 0 && strcmp(boundary->iteratorDependenciesArray[depth][j], iterators[1]) != 0)
+//   {
+//     boundary->iteratorDependenciesArray[depth][j] = "";
+//   }
+// }
+#pragma endregion
+  }
+
+  strcat(unuaryUnion, " }");
+
+  TCD_IterationDomain iterationDomainsUnion = (TCD_IterationDomain)malloc(sizeof(struct iterationDomain));
+  iterationDomainsUnion->next = NULL;
+
+  iterationDomainsUnion->iterationDomain = (char *)malloc(statement->domain->nb_rows * (OSL_MAX_STRING + 1) * sizeof(char));
+  strcpy(iterationDomainsUnion->iterationDomain, unuaryUnion);
+
+  boundary->nameArray = name_array;
+
+  // Free the array of strings.
+  // if (name_array != NULL)
+  // {
+  //   for (i = 0; i < statement->domain->nb_columns; i++)
+  //     free(name_array[i]);
+  //   free(name_array);
+  // }
+  // free(unionList);
+  // free(unuaryUnion);
+
+  if (boundary->firstIterDomainOfUnion->first == NULL)
+  {
+    boundary->firstIterDomainOfUnion->first = iterationDomainsUnion;
+  }
+  else
+  {
+    TCD_IterationDomain current = boundary->firstIterDomainOfUnion->first;
+    while (current->next != NULL)
+    {
+      current = current->next;
+    }
+    current->next = iterationDomainsUnion;
+  }
+  statement->domain = statement->domain->next;
 
   return boundary;
 }
@@ -296,12 +366,7 @@ void printBoundaries(TCD_BoundaryList boundaryList)
     printf("Boundary: -----\n");
     TCD_IterationDomain unions = boundary->firstIterDomainOfUnion->first;
     int i = 0;
-    while (unions != NULL)
-    {
-      printf("%d. Union: %s\n", i, unions->iterationDomain);
-      unions = unions->next;
-      i++;
-    }
+    printf("%s\n", unions->iterationDomain);
     boundary = boundary->next;
   }
   return;

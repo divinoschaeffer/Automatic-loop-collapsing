@@ -9,5 +9,6 @@
         "utility": "c"
     },
     "C_Cpp.errorSquiggles": "enabled",
-    "cmake.configureOnOpen": true
+    "cmake.configureOnOpen": true,
+    "cmake.sourceDirectory": "C:/Users/23544/Documents/Uni/m1s2/TER/Automatic-loop-collapsing/clan/osl/tests"
 }

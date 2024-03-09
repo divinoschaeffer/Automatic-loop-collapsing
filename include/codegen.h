@@ -15,12 +15,15 @@
 
 #include "flow.h"
 #include "data.h"
+#include "format_helper.h"
 
 /**
  * @brief Computes the new SCoP structure using the scop in global flow and the boundary list
  * @param boundaryList The boundary list
  */
 void generateCode(TCD_BoundaryList boundaryList);
+
+void generateHeaderFile(TCD_BoundaryList boundaryList);
 
 CloogState *cloog_isl_state_malloc(struct isl_ctx *ctx);
 
