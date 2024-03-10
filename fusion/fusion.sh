@@ -11,10 +11,6 @@ output_file="$3"
 start_pattern_input="#pragma scop"
 end_pattern_input="#pragma endscop"
 
-start_pattern_new="//start//"
-end_pattern_end="//end//"
-
-
 if [ ! -f "$input_file" ]; then
     echo "Erreur: Le fichier input '$input_file' n'existe pas."
     exit 1
@@ -27,27 +23,44 @@ fi
 
 extract_content() {
     file="$1"
-    debut="$2"
-    fin="$3"
-    awk -v d="$debut" -v f="$fin" '$0 ~ d {flag=1; next} $0 ~ f {flag=0} flag' "$file"
+    d="$2"
+    f="$3"
+    contenu=$(awk -v d="$d" -v f="$f" '
+        {
+            if ($0 ~ d) {
+                flag=1
+                next
+            }
+            if ($0 ~ f) {
+                flag=0
+                print ""
+                next
+            }
+            if (flag) {
+                printf "%s%s", sep, $0
+                sep="\n"
+            }
+        }
+    ' "$file")
+    echo "$contenu"
 }
 
-contenu_new=$(extract_content "$new_file" "$start_pattern_new" "$end_pattern_new")
+extract_content "$new_file" "//start//" "//end//" > temp_file
 
-awk -v debut="$start_pattern_input" -v fin="$end_pattern_input" -v contenu="$contenu_new" '
-    {
-        if ($0 ~ debut) {
-            print $0
-            print contenu
-            in_block = 1
-            next
+awk -v debut="$start_pattern_input" -v fin="$end_pattern_input" 'BEGIN { print "" }
+    $0 ~ debut { 
+        in_block = 1
+        while ((getline < "temp_file") > 0) {
+            print
         }
-        if ($0 ~ fin) {
-            in_block = 0
-            next
-        }
-        if (!in_block) print
+        close("temp_file")
+        next
     }
+    $0 ~ fin { in_block = 0 }
+    !in_block { print }
+    END { if (in_block) print "" }
 ' "$input_file" > "$output_file"
+
+rm temp_file
 
 echo "Le fichier de sortie '$output_file' a été généré avec succès."
