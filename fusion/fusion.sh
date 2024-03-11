@@ -8,8 +8,6 @@ fi
 input_file="$1"
 new_file="$2"
 output_file="$3"
-start_pattern_input="#pragma scop"
-end_pattern_input="#pragma endscop"
 
 if [ ! -f "$input_file" ]; then
     echo "Erreur: Le fichier input '$input_file' n'existe pas."
@@ -21,46 +19,57 @@ if [ ! -f "$new_file" ]; then
     exit 1
 fi
 
-extract_content() {
-    file="$1"
-    d="$2"
-    f="$3"
-    contenu=$(awk -v d="$d" -v f="$f" '
-        {
-            if ($0 ~ d) {
-                flag=1
-                next
-            }
-            if ($0 ~ f) {
-                flag=0
-                print ""
-                next
-            }
-            if (flag) {
-                printf "%s%s", sep, $0
-                sep="\n"
-            }
-        }
-    ' "$file")
-    echo "$contenu"
-}
+temp_dir=$(mktemp -d)
 
-extract_content "$new_file" "//start//" "//end//" > temp_file
+block_number=0
 
-awk -v debut="$start_pattern_input" -v fin="$end_pattern_input" 'BEGIN { print "" }
-    $0 ~ debut { 
-        in_block = 1
-        while ((getline < "temp_file") > 0) {
-            print
-        }
-        close("temp_file")
+awk -v temp_dir="$temp_dir" '
+    BEGIN { in_block=0 }
+    /\/\/start\/\// {
+        in_block=1
+        block_number++
         next
     }
-    $0 ~ fin { in_block = 0 }
-    !in_block { print }
-    END { if (in_block) print "" }
-' "$input_file" > "$output_file"
+    /\/\/end\/\// {
+        in_block=0
+        next
+    }
+    in_block {
+        block_file = temp_dir "/" block_number
+        print $0 > block_file
+    }
+' "$new_file"
 
-rm temp_file
+block_index=0
+
+echo '#include "new.h"' > "$output_file"
+
+awk -v d="#pragma scop" -v f="#pragma endscop" -v temp_dir="$temp_dir" '
+    BEGIN {
+        block_index = 1
+        inside = 0
+    }
+    $0 ~ d {
+        block_file = temp_dir "/" block_index
+        inside = 1
+        while (getline < block_file > 0) {
+            print
+        }
+        block_index++
+        next
+    }
+    $0 ~ f {
+        inside = 0
+        next
+    }
+    inside{
+        next
+    }
+    {
+        print
+    }
+' "${input_file}" >> "${output_file}"
 
 echo "Le fichier de sortie '$output_file' a été généré avec succès."
+
+rm -rf "$temp_dir"
