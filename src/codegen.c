@@ -50,8 +50,7 @@ write_init_section(TCD_Boundary boundary)
     strcat(outputString, "\t{\n");
     // DONE: for every iteration variables, do the trahrhe function call here
 
-    // int max_depth = boundary->depth;
-    int max_depth = 2;
+    int max_depth = tcdFlowData->collapseParameters[boundary_index];
     int curr_depth = 0;
     while (curr_depth < max_depth)
     {
@@ -208,8 +207,7 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
 
     // DONE - Remove from scop the part that is not in the iteration domain (ie handled by manual code generation)
     // while we are have not hit the depth of parallelism of the boundary, we need to go deeper in the loop nest
-    // int loop_nest_depth = boundary->depth;
-    int loop_nest_depth = 2;
+    int loop_nest_depth = tcdFlowData->collapseParameters[boundary_index];
     struct clast_expr *stop_conditions[loop_nest_depth];
     int *stop_conditions_int = (int *)malloc(loop_nest_depth * sizeof(int));
     while (loop_nest_depth > 0)

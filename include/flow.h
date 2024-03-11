@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <osl/osl.h>
 
@@ -28,6 +29,11 @@ typedef struct
      * @brief Output file.
      */
     char *outputFile;
+
+    /**
+     * @brief Collapse parameters.
+     */
+    int *collapseParameters;
 
     /**
      * @brief Pointer on the current polyedral representation of the source code.
