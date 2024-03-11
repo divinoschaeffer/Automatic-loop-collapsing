@@ -81,10 +81,6 @@ struct boundary
    */
   struct nlist *hashTable;
   /**
-   * @brief The depth of the loop nest to collapse
-   */
-  int depth; // TODO: must be set while retrieving the scop directive from the trahrhe call
-  /**
    * @brief Next loop boundaries
    */
   struct boundary *next;
