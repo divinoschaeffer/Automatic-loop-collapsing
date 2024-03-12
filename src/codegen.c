@@ -28,7 +28,7 @@ write_init_section(TCD_Boundary boundary)
     char *tmp = (char *)malloc(1024 * sizeof(char));
     // include trahrhe header
     char *header_file = (char *)malloc(1024 * sizeof(char));
-    strcpy(header_file, INTERMEDIATE_FILENAME);
+    strcpy(header_file, tcdFlowData->outputFile);
     strcat(header_file, ".h");
     sprintf(tmp, "#include \"%s\"\n\n", header_file);
     strcat(outputString, tmp);

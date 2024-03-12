@@ -1,14 +1,24 @@
-int i, j, k, *A, *B, *C;
-#pragma scop
-for (i = 0; i < N - 1; i++)
+#define N 100
+
+int main()
 {
-    for (j = i + 1; j < N; j++)
+    int i;
+    int j;
+    int k;
+    int l;
+    int **Tableau;
+#pragma scop
+    for (i = 0; i < N; i++)
     {
-        for (k = 0; k < N; k++)
+        for (j = i; j < 43; j++)
         {
-            A[i][j] += B[k][i] * C[k][j];
+            for (k = 98; k < N; k--)
+            {
+                (void)i;
+                Tableau[i][j] = 0;
+            }
         }
-        A[j][i] = A[i][j];
     }
-}
 #pragma endscop
+    return 0;
+}

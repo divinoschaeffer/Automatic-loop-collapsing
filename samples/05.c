@@ -1,3 +1,5 @@
+#define N 100
+
 int main()
 {
     int i;
@@ -5,14 +7,18 @@ int main()
     int k;
     int l;
     int **Tableau;
-#pragma scop
-    for (i = 0; i < 30; i++)
+#pragma trahrhe collapse(2)
+    for (i = 0; i < N; i++)
+    {
         for (j = i; j < 43; j++)
-            for (k = 98; k > 23 || l > 9; k--)
+        {
+            for (k = 98; k < N; k--)
             {
                 (void)i;
                 Tableau[i][j] = 0;
             }
-#pragma endscop
+        }
+    }
+#pragma endtrahrhe
     return 0;
 }
