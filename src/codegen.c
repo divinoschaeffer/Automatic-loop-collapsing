@@ -28,12 +28,15 @@ write_init_section(TCD_Boundary boundary)
     char *tmp = (char *)malloc(1024 * sizeof(char));
     // include trahrhe header
     char *header_file = (char *)malloc(1024 * sizeof(char));
-    strcpy(header_file, tcdFlowData->outputFile);
+    strcpy(header_file, INTERMEDIATE_FILENAME);
     strcat(header_file, ".h");
     sprintf(tmp, "#include \"%s\"\n\n", header_file);
     strcat(outputString, tmp);
 
-    sprintf(tmp, "unsigned pc_%d;\n", boundary_index);
+    sprintf(tmp, "//start//\n");
+    strcat(outputString, tmp);
+
+    sprintf(tmp, "\nunsigned pc_%d;\n", boundary_index);
     strcat(outputString, tmp);
     // we need to index ehrhart calls as they may be outer vars with the same name among different boundaries
     sprintf(tmp, "unsigned upper_bound_%d = Ehrhart%d(%s);\n", boundary_index, boundary_index, outer_var_bounds);
@@ -284,6 +287,8 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
 
     // Finalisation code
     fprintf(outputFile, "}\n\n");
+
+    fprintf(outputFile, "%s", "//end//\n");
 }
 
 void generateCode(TCD_BoundaryList boundaryList)
@@ -303,7 +308,7 @@ void generateCode(TCD_BoundaryList boundaryList)
     options->compilable = 1;
 
     char *outputFilename = (char *)malloc(1024 * sizeof(char));
-    strcpy(outputFilename, tcdFlowData->outputFile);
+    strcpy(outputFilename, INTERMEDIATE_FILENAME);
     strcat(outputFilename, ".c");
 
     FILE *outputFile = fopen(outputFilename, "w+");
@@ -394,7 +399,7 @@ void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile)
 void generateHeaderFile(TCD_BoundaryList boundaryList)
 {
     char *headerFilename = (char *)malloc(1024 * sizeof(char));
-    strcpy(headerFilename, tcdFlowData->outputFile);
+    strcpy(headerFilename, INTERMEDIATE_FILENAME);
     strcat(headerFilename, ".h");
     FILE *outputFile = fopen(headerFilename, "w+");
     if (outputFile == NULL)
@@ -410,4 +415,18 @@ void generateHeaderFile(TCD_BoundaryList boundaryList)
 
         boundary = boundary->next;
     }
+}
+
+void mergeGeneratedCode()
+{
+    char *command = (char *)malloc(1024 * sizeof(char));
+    char *pwd = (char *)malloc(100 * sizeof(char));
+
+    getcwd(pwd, 100);
+    sprintf(command, "%s/fusion/fusion.sh %s %s.c %s", pwd, tcdFlowData->entryFile, INTERMEDIATE_FILENAME, tcdFlowData->outputFile);
+
+    system(command);
+
+    free(command);
+    free(pwd);
 }

@@ -28,7 +28,7 @@ static inline long int Ranking0(long int i, long int j, long int k,long int N) {
 static inline long int PCMin_10(long int N) {
  
   if ((N>=2)) {
-    return 1L;
+    return Caractere inconnu: :;
   }
   return Ehrhart0(N);
 } /* end PCMin_10 */
@@ -38,7 +38,7 @@ static inline long int PCMin_10(long int N) {
 static inline long int PCMax_10(long int N) {
  
   if ((N>=2)) {
-    return (powl((long int)N,3L)-powl((long int)N,2L))/2L;
+    return Caractere inconnu: :;
   }
   return 0;
 } /* end PCMax_10 */
@@ -48,7 +48,7 @@ static inline long int trahrhe_i0(long int pc, long int N) {
  
   if ( (PCMin_10(N) <= pc) && (pc <= PCMax_10(N)) ) {
  
-  long int i = floorl(creall(-(csqrtl((-8.L*(long double)N*(long double)pc)+4.L*cpowl((long double)N,4.L)-4.L*cpowl((long double)N,3.L)+cpowl((long double)N,2.L)+8.L*(long double)N)-2.L*cpowl((long double)N,2.L)+(long double)N)/(2.L*(long double)N))+0.00000001);
+  long int i = Caractere inconnu: 0;
   if ((N>=i+2) && ((i>=0))) {
     return i;
   }
@@ -63,7 +63,7 @@ static inline long int trahrhe_j0(long int pc, long int i, long int N) {
  
   if ( ((i>=0)) && (PCMin_10(N) <= pc) && (pc <= PCMax_10(N)) ) {
  
-  long int j = floorl(creall((2.L*(long double)pc+(long double)i*((long double)N*(long double)i+(3.L-2.L*(long double)N)*(long double)N)+2.L*(long double)N-2.L)/(2.L*(long double)N))+0.00000001);
+  long int j = floorl(creall(1.L)+0.00000001);
   if ((i>=0) && ((j>=i+1)) && ((N>=j+1))) {
     return j;
   }
