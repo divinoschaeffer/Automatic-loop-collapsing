@@ -320,7 +320,7 @@ void generateCode(TCD_BoundaryList boundaryList)
     }
 
     // generation
-    TCD_Boundary boundary = boundaryList->first;
+    TCD_Boundary boundary = copyBoundary(boundaryList->first);
     while (boundary != NULL)
     {
         input = cloog_input_from_osl_scop(state, scop);
@@ -352,7 +352,7 @@ void generateCode(TCD_BoundaryList boundaryList)
     fclose(outputFile);
 }
 
-void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile)
+void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundary_index)
 {
     char *isl_domain = boundary->firstIterDomainOfUnion->first->iterationDomain;
 
@@ -408,12 +408,14 @@ void generateHeaderFile(TCD_BoundaryList boundaryList)
         exit(EXIT_FAILURE);
     }
 
-    TCD_Boundary boundary = boundaryList->first;
+    TCD_Boundary boundary = copyBoundary(boundaryList->first);
+    int index = 0;
     while (boundary != NULL)
     {
-        generateBoundaryHeader(boundary, outputFile);
+        generateBoundaryHeader(boundary, outputFile, index);
 
         boundary = boundary->next;
+        index++;
     }
 }
 

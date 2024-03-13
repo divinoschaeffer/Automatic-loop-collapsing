@@ -1,18 +1,17 @@
 #include "new.h"
-#define N 100
-
 int main()
 {
-    int i;
-    int j;
-    int k;
-    int l;
-    int **Tableau;
+	int i;
+	int j;
+	int k;
+	int l;
+	int M;
+	int N;
 
 unsigned pc_0;
 unsigned upper_bound_0 = Ehrhart0(N);
 unsigned first_iteration_0 = 1;
-#pragma omp parallel for private(i,j,k) firstprivate(first_iteration_0) schedule(static)
+#pragma omp parallel for private(i,j) firstprivate(first_iteration_0) schedule(static)
 for (pc_0 = 1; pc_0 <= upper_bound_0; pc_0++)
 {
 	if (first_iteration_0)
@@ -22,9 +21,32 @@ for (pc_0 = 1; pc_0 <= upper_bound_0; pc_0++)
 		first_iteration_0 = 0;
 	}
 	
-	for (k=-N+1;;k++) {
+	(void)(i);
+
+	j++;
+	if (j < N-1)
+	{
+		i++;
+		j = i + 1;
+	}
+}
+
+
+unsigned pc_1;
+unsigned upper_bound_1 = Ehrhart1(M);
+unsigned first_iteration_1 = 1;
+#pragma omp parallel for private(i,j,k) firstprivate(first_iteration_1) schedule(static)
+for (pc_1 = 1; pc_1 <= upper_bound_1; pc_1++)
+{
+	if (first_iteration_1)
+	{
+		i = trahrhe_i1(pc_1,M);
+		j = trahrhe_j1(pc_1,i,M);
+		first_iteration_1 = 0;
+	}
+	
+	for (k=-98;k<=-M-1;k++) {
 	  (void)(i);
-	  Tableau[i][j] = 0;
 	}
 
 	j++;
@@ -35,5 +57,5 @@ for (pc_0 = 1; pc_0 <= upper_bound_0; pc_0++)
 	}
 }
 
-    return 0;
+	return 0;
 }

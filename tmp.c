@@ -1,4 +1,3 @@
-for (k=-N+1;;k++) {
+for (k=-98;k<=-M-1;k++) {
   (void)(i);
-  Tableau[i][j] = 0;
 }
