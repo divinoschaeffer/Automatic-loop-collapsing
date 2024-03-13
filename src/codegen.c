@@ -187,7 +187,7 @@ write_increment_section(TCD_Boundary boundary, struct clast_expr *stop_condition
 
     outputString[0] = '\0';
 
-    int max_depth = 2;
+    int max_depth = tcdFlowData->collapseParameters[boundary_index];
     sprintf(outputString, "\n\t%s++;", name_array[max_depth]);
     increment(max_depth - 1, outer_var_bounds, name_array, outputString, stop_conditions, stop_conditions_int, options);
 
@@ -288,7 +288,7 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
     // Finalisation code
     fprintf(outputFile, "}\n\n");
 
-    fprintf(outputFile, "%s", "//end//\n");
+    fprintf(outputFile, "//end//\n");
 }
 
 void generateCode(TCD_BoundaryList boundaryList)

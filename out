@@ -18,18 +18,17 @@ for (pc_0 = 1; pc_0 <= upper_bound_0; pc_0++)
 	if (first_iteration_0)
 	{
 		i = trahrhe_i0(pc_0,N);
+		j = trahrhe_j0(pc_0,i,N);
 		first_iteration_0 = 0;
 	}
 	
-	for (j=i;j<=42;j++) {
-	  for (k=-N+1;;k++) {
-	    (void)(i);
-	    Tableau[i][j] = 0;
-	  }
+	for (k=-N+1;;k++) {
+	  (void)(i);
+	  Tableau[i][j] = 0;
 	}
 
 	j++;
-	if (j < min(42,N-1))
+	if (j < 42)
 	{
 		i++;
 		j = i + 1;
