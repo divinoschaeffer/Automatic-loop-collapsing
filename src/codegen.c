@@ -76,7 +76,7 @@ write_init_section(TCD_Boundary boundary)
         int token_count = 0;
         do
         {
-            if (token_count <= curr_depth)
+            if (token_count <= max_depth)
             {
                 strcat(vars, ",");
                 strcat(vars, token);
@@ -320,7 +320,7 @@ void generateCode(TCD_BoundaryList boundaryList)
     }
 
     // generation
-    TCD_Boundary boundary = copyBoundary(boundaryList->first);
+    TCD_Boundary boundary = boundaryList->first;
     while (boundary != NULL)
     {
         input = cloog_input_from_osl_scop(state, scop);
@@ -408,7 +408,7 @@ void generateHeaderFile(TCD_BoundaryList boundaryList)
         exit(EXIT_FAILURE);
     }
 
-    TCD_Boundary boundary = copyBoundary(boundaryList->first);
+    TCD_Boundary boundary = boundaryList->first;
     int index = 0;
     while (boundary != NULL)
     {
