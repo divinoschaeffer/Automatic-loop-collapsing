@@ -1,13 +1,14 @@
 #!/bin/bash
 
-if [ "$#" -ne 3 ]; then
-    echo "Usage: $0 <input_file> <new_file> <output_file>"
+if [ "$#" -ne 4 ]; then
+    echo "Usage: $0 <input_file> <new_file> <include> <output_file>"
     exit 1
 fi
 
 input_file="$1"
 new_file="$2"
-output_file="$3"
+output_file="$4"
+include="$3"
 
 if [ ! -f "$input_file" ]; then
     echo "Erreur: Le fichier input '$input_file' n'existe pas."
@@ -42,7 +43,7 @@ awk -v temp_dir="$temp_dir" '
 
 block_index=0
 
-echo '#include "new.h"' > "$output_file"
+echo "$include" > "$output_file"
 
 awk -v d="#pragma scop" -v f="#pragma endscop" -v temp_dir="$temp_dir" '
     BEGIN {
