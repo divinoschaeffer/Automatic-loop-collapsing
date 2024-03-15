@@ -4,10 +4,10 @@ int main()
 	int j;
 	int k;
 	int l;
-	int M;
-	int N;
-	int MAX_I;
-	int MAX_J;
+	int M = 20;
+	int N = 30;
+	int MAX_I = 30;
+	int MAX_J = 30;
 #pragma trahrhe collapse(2)
 	for (i = 0; i < 30; i++)
 		for (j = 2; j < N; j++)

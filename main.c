@@ -65,8 +65,9 @@ int main(int argc, char **argv)
 #pragma endregion
 
     /* Save the planet. */
-    // clan_options_free(options);
-    // osl_scop_free(scop);
+    removeTemporaryFiles();
+    clan_options_free(options);
+    osl_scop_free(scop);
 
     return 0;
 }

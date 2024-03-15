@@ -27,6 +27,8 @@ void generateHeaderFile(TCD_BoundaryList boundaryList);
 
 void mergeGeneratedCode();
 
+void removeTemporaryFiles();
+
 CloogState *cloog_isl_state_malloc(struct isl_ctx *ctx);
 
 #endif

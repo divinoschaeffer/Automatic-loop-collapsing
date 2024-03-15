@@ -13,13 +13,4 @@ int main()
 		}
 	}
 #pragma endscop
-#pragma scop
-	for (l = 0; l < M - 1 || w > 1 || x < 3 || y >= 5; l++)
-	{
-		tab[l];
-		a[w + l];
-		b[x - l];
-		c[l - y];
-	}
-#pragma endscop
 }

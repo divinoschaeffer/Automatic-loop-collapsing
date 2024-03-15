@@ -399,7 +399,7 @@ void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundar
 void generateHeaderFile(TCD_BoundaryList boundaryList)
 {
     char *headerFilename = (char *)malloc(1024 * sizeof(char));
-    strcpy(headerFilename, INTERMEDIATE_FILENAME);
+    strcpy(headerFilename, tcdFlowData->outputFile);
     strcat(headerFilename, ".h");
     FILE *outputFile = fopen(headerFilename, "w+");
     if (outputFile == NULL)
@@ -425,10 +425,18 @@ void mergeGeneratedCode()
     char *pwd = (char *)malloc(100 * sizeof(char));
 
     getcwd(pwd, 100);
-    sprintf(command, "%s/fusion/fusion.sh %s %s.c %s", pwd, tcdFlowData->entryFile, INTERMEDIATE_FILENAME, tcdFlowData->outputFile);
+    sprintf(command, "%s/fusion/fusion.sh %s %s.c '#include \"%s.h\"' %s.c", pwd, tcdFlowData->entryFile, INTERMEDIATE_FILENAME, tcdFlowData->outputFile, tcdFlowData->outputFile);
 
     system(command);
 
     free(command);
     free(pwd);
+}
+
+void removeTemporaryFiles()
+{
+    char *command = (char *)malloc(1024 * sizeof(char));
+    sprintf(command, "rm %s.c %s %s %s", INTERMEDIATE_FILENAME, SCOPED_FILENAME, COLLAPSE_PARAMETERS_FILENAME, "tmp.c");
+    system(command);
+    free(command);
 }
