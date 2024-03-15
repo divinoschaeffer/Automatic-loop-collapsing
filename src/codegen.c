@@ -33,7 +33,10 @@ write_init_section(TCD_Boundary boundary)
     sprintf(tmp, "#include \"%s\"\n\n", header_file);
     strcat(outputString, tmp);
 
-    sprintf(tmp, "unsigned pc_%d;\n", boundary_index);
+    sprintf(tmp, "//start//\n");
+    strcat(outputString, tmp);
+
+    sprintf(tmp, "\nunsigned pc_%d;\n", boundary_index);
     strcat(outputString, tmp);
     // we need to index ehrhart calls as they may be outer vars with the same name among different boundaries
     sprintf(tmp, "unsigned upper_bound_%d = Ehrhart%d(%s);\n", boundary_index, boundary_index, outer_var_bounds);
@@ -73,7 +76,7 @@ write_init_section(TCD_Boundary boundary)
         int token_count = 0;
         do
         {
-            if (token_count <= curr_depth)
+            if (token_count <= max_depth)
             {
                 strcat(vars, ",");
                 strcat(vars, token);
@@ -184,7 +187,7 @@ write_increment_section(TCD_Boundary boundary, struct clast_expr *stop_condition
 
     outputString[0] = '\0';
 
-    int max_depth = 2;
+    int max_depth = tcdFlowData->collapseParameters[boundary_index];
     sprintf(outputString, "\n\t%s++;", name_array[max_depth]);
     increment(max_depth - 1, outer_var_bounds, name_array, outputString, stop_conditions, stop_conditions_int, options);
 
@@ -284,6 +287,8 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
 
     // Finalisation code
     fprintf(outputFile, "}\n\n");
+
+    fprintf(outputFile, "//end//\n");
 }
 
 void generateCode(TCD_BoundaryList boundaryList)
@@ -303,7 +308,7 @@ void generateCode(TCD_BoundaryList boundaryList)
     options->compilable = 1;
 
     char *outputFilename = (char *)malloc(1024 * sizeof(char));
-    strcpy(outputFilename, tcdFlowData->outputFile);
+    strcpy(outputFilename, INTERMEDIATE_FILENAME);
     strcat(outputFilename, ".c");
 
     FILE *outputFile = fopen(outputFilename, "w+");
@@ -347,7 +352,7 @@ void generateCode(TCD_BoundaryList boundaryList)
     fclose(outputFile);
 }
 
-void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile)
+void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundary_index)
 {
     char *isl_domain = boundary->firstIterDomainOfUnion->first->iterationDomain;
 
@@ -404,10 +409,34 @@ void generateHeaderFile(TCD_BoundaryList boundaryList)
     }
 
     TCD_Boundary boundary = boundaryList->first;
+    int index = 0;
     while (boundary != NULL)
     {
-        generateBoundaryHeader(boundary, outputFile);
+        generateBoundaryHeader(boundary, outputFile, index);
 
         boundary = boundary->next;
+        index++;
     }
+}
+
+void mergeGeneratedCode()
+{
+    char *command = (char *)malloc(1024 * sizeof(char));
+    char *pwd = (char *)malloc(100 * sizeof(char));
+
+    getcwd(pwd, 100);
+    sprintf(command, "%s/fusion/fusion.sh %s %s.c '#include \"%s.h\"' %s.c", pwd, tcdFlowData->entryFile, INTERMEDIATE_FILENAME, tcdFlowData->outputFile, tcdFlowData->outputFile);
+
+    system(command);
+
+    free(command);
+    free(pwd);
+}
+
+void removeTemporaryFiles()
+{
+    char *command = (char *)malloc(1024 * sizeof(char));
+    sprintf(command, "rm %s.c %s %s %s", INTERMEDIATE_FILENAME, SCOPED_FILENAME, COLLAPSE_PARAMETERS_FILENAME, "tmp.c");
+    system(command);
+    free(command);
 }

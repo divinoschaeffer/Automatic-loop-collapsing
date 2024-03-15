@@ -15,6 +15,10 @@
 
 #include <osl/osl.h>
 
+#define SCOPED_FILENAME "scope.source.scop"
+#define COLLAPSE_PARAMETERS_FILENAME "collapse_parameter.source.txt"
+#define INTERMEDIATE_FILENAME "intermediate.source"
+
 /**
  * @brief Computational data to be transported during the collapsing
  */

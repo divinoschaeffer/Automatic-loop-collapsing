@@ -57,11 +57,17 @@ int main(int argc, char **argv)
     /* Step 4: Generate output code */
     generateCode(boundaryList);
 
+#pragma region Step5
+
+    /* Step 5: Merge generated code with untouched parts */
+    mergeGeneratedCode();
+
 #pragma endregion
 
     /* Save the planet. */
-    // clan_options_free(options);
-    // osl_scop_free(scop);
+    removeTemporaryFiles();
+    clan_options_free(options);
+    osl_scop_free(scop);
 
     return 0;
 }

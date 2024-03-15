@@ -1,5 +1,5 @@
 int i, j, k, *A, *B, *C;
-#pragma scop
+#pragma trahrhe collapse(2)
 for (i = 0; i < N - 1; i++)
 {
     for (j = i + 1; j < N; j++)
@@ -11,4 +11,4 @@ for (i = 0; i < N - 1; i++)
         A[j][i] = A[i][j];
     }
 }
-#pragma endscop
+#pragma endtrahrhe

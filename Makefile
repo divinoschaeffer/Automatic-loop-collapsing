@@ -18,3 +18,4 @@ $(TARGET): main.c main.h $(SRC_FILES) $(HEADER_FILES)
 
 clean:
 	$(RM) $(TARGET)
+	$(RM) *.source.*

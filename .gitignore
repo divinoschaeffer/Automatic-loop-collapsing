@@ -7,3 +7,6 @@ Maxima2Cfloat
 Maxima2Cint
 Maxima2MPC
 Pourcent2Mod
+*.source.*
+out
+out.*
