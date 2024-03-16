@@ -26,7 +26,7 @@ void write_init_section(TCD_Boundary boundary)
 
     fs_writef("//start//");
 
-    fs_writef("\nunsigned pc_%d;", boundary_index);
+    fs_writef("unsigned pc_%d;", boundary_index);
     // we need to index ehrhart calls as they may be outer vars with the same name among different boundaries
     fs_writef("unsigned upper_bound_%d = Ehrhart%d(%s);", boundary_index, boundary_index, outer_var_bounds);
     fs_writef("unsigned first_iteration_%d = 1;", boundary_index);
@@ -260,15 +260,13 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
 
     string[fsize] = 0;
 
-    fs_tabular();
-    fs_writef(string);
-    fs_untabular();
+    fs_writef("%s", tabStringReturn(string, fsize));
 
     // Increment
     write_increment_section(boundary, stop_conditions, stop_conditions_int, options);
 
     // Finalisation code
-    fs_writef("}\n\n");
+    fs_writef("}\n");
 
     fs_writef("//end//\n");
 }
@@ -294,6 +292,7 @@ void generateCode(TCD_BoundaryList boundaryList)
     strcat(outputFilename, ".c");
 
     fs_open(outputFilename);
+    fs_tabular();
     // generation
     TCD_Boundary boundary = boundaryList->first;
     while (boundary != NULL)
@@ -323,7 +322,7 @@ void generateCode(TCD_BoundaryList boundaryList)
         scop = scop->next;
         boundary_index++;
     }
-
+    fs_untabular();
     fs_close();
 }
 

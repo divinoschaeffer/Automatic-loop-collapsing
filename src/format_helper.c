@@ -23,6 +23,22 @@ void tabString(FILE *file, char *string, long fsize)
     fprintf(file, "%s", tabbedString);
 }
 
+char *tabStringReturn(char *string, long fsize)
+{
+    char *tabbedString = (char *)malloc((fsize + 1) * sizeof(char));
+    tabbedString[0] = '\0';
+    char *line = strtok(string, "\n");
+    while (line != NULL)
+    {
+        strcat(tabbedString, "\t");
+        strcat(tabbedString, line);
+        strcat(tabbedString, "\n");
+        line = strtok(NULL, "\n");
+    }
+
+    return tabbedString;
+}
+
 int digit_check(char key[])
 {
     for (int i = 0; i < strlen(key); i++)
