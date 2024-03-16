@@ -9,49 +9,37 @@
 
 #include "codegen.h"
 
+FILE *fs;
 extern TCD_FlowData *tcdFlowData;
 
 unsigned boundary_index = 0;
 
-char *
-write_init_section(TCD_Boundary boundary)
+void write_init_section(TCD_Boundary boundary)
 {
-    char *outputString = (char *)malloc(1024 * sizeof(char));
-
     char *outer_var = boundary->outerLoopVar;
     char *outer_var_bounds = boundary->outerLoopUpperBound;
     char *iteration_domains = boundary->iterationDomainsString;
     char **name_array = boundary->nameArray;
 
-    outputString[0] = '\0';
-
-    char *tmp = (char *)malloc(1024 * sizeof(char));
     // include trahrhe header
-    char *header_file = (char *)malloc(1024 * sizeof(char));
-    strcpy(header_file, tcdFlowData->outputFile);
-    strcat(header_file, ".h");
-    sprintf(tmp, "#include \"%s\"\n\n", header_file);
-    strcat(outputString, tmp);
+    fs_writef("#include \"%s.h\"\n", tcdFlowData->outputFile);
 
-    sprintf(tmp, "//start//\n");
-    strcat(outputString, tmp);
+    fs_writef("//start//");
 
-    sprintf(tmp, "\nunsigned pc_%d;\n", boundary_index);
-    strcat(outputString, tmp);
+    fs_writef("\nunsigned pc_%d;", boundary_index);
     // we need to index ehrhart calls as they may be outer vars with the same name among different boundaries
-    sprintf(tmp, "unsigned upper_bound_%d = Ehrhart%d(%s);\n", boundary_index, boundary_index, outer_var_bounds);
-    strcat(outputString, tmp);
-    sprintf(tmp, "unsigned first_iteration_%d = 1;\n", boundary_index);
-    strcat(outputString, tmp);
-    sprintf(tmp, "#pragma omp parallel for private(%s) firstprivate(first_iteration_%d) schedule(static)\n", iteration_domains, boundary_index);
-    strcat(outputString, tmp);
-    sprintf(tmp, "for (pc_%d = 1; pc_%d <= upper_bound_%d; pc_%d++)\n", boundary_index, boundary_index, boundary_index, boundary_index);
-    strcat(outputString, tmp);
-    strcat(outputString, "{\n");
-    sprintf(tmp, "\tif (first_iteration_%d)\n", boundary_index);
-    strcat(outputString, tmp);
-    strcat(outputString, "\t{\n");
-    // DONE: for every iteration variables, do the trahrhe function call here
+    fs_writef("unsigned upper_bound_%d = Ehrhart%d(%s);", boundary_index, boundary_index, outer_var_bounds);
+    fs_writef("unsigned first_iteration_%d = 1;", boundary_index);
+    fs_writef("#pragma omp parallel for private(%s) firstprivate(first_iteration_%d) schedule(static)", iteration_domains, boundary_index);
+    fs_writef("for (pc_%d = 1; pc_%d <= upper_bound_%d; pc_%d++)", boundary_index, boundary_index, boundary_index, boundary_index);
+    fs_writef("{");
+
+    fs_tabular();
+
+    fs_writef("if (first_iteration_%d)", boundary_index);
+    fs_writef("{");
+
+    fs_tabular();
 
     int max_depth = tcdFlowData->collapseParameters[boundary_index];
     int curr_depth = 0;
@@ -88,20 +76,15 @@ write_init_section(TCD_Boundary boundary)
             token_count++;
             token = strtok(NULL, ",");
         } while (token != NULL);
-
-        sprintf(tmp, "\t\t%s = trahrhe_%s%d(%s);\n", name_array[curr_depth + 1], name_array[curr_depth + 1], boundary_index, vars);
-        strcat(outputString, tmp);
+        fs_writef("%s = trahrhe_%s%d(%s);", name_array[curr_depth + 1], name_array[curr_depth + 1], boundary_index, vars);
 
         curr_depth++;
     }
-    sprintf(tmp, "\t\tfirst_iteration_%d = 0;\n", boundary_index);
-    strcat(outputString, tmp);
-    strcat(outputString, "\t}\n");
-    strcat(outputString, "\t\n");
-
-    free(tmp);
-
-    return outputString;
+    fs_writef("first_iteration_%d = 0;", boundary_index);
+    fs_untabular();
+    fs_writef("}");
+    fs_writef("");
+    fs_untabular();
 }
 
 char *take(int index, char *string)
@@ -119,7 +102,6 @@ char *take(int index, char *string)
 void increment(int curr_depth,
                char *outer_var_bounds,
                char **name_array,
-               char *outputString,
                struct clast_expr *stop_conditions[],
                int *stop_conditions_int,
                CloogOptions *options)
@@ -130,7 +112,6 @@ void increment(int curr_depth,
     }
     // the innermost loop is incremented first, then when it reaches its upper bound, the next loop is incremented  etc.
     char *tmp = (char *)malloc(1024 * sizeof(char));
-    strcat(outputString, "\n");
     // sprintf(tmp, "\tif (%s >= %s)\n", name_array[curr_depth], take(curr_depth, outer_var_bounds));
     FILE *tmpFile = fopen("tmp2.c", "w+");
     if (tmpFile == NULL)
@@ -149,55 +130,55 @@ void increment(int curr_depth,
     tabString(tmpFile, string, fsize);
     if (stop_conditions_int[curr_depth - 1] == 0)
     {
-        sprintf(tmp, "\tif (%s > %s)\n", name_array[curr_depth + 1], string);
+        sprintf(tmp, "if (%s > %s)", name_array[curr_depth + 1], string);
     }
     else
     {
-        sprintf(tmp, "\tif (%s < %s)\n", name_array[curr_depth + 1], string);
+        sprintf(tmp, "if (%s < %s)", name_array[curr_depth + 1], string);
     }
     // remove tmp2.c
     remove("tmp2.c");
-    strcat(outputString, tmp);
-    strcat(outputString, "\t{\n");
-    sprintf(tmp, "\t\t%s++;\n", name_array[curr_depth]);
-    strcat(outputString, tmp);
+
+    // print
+    fs_writef("%s", tmp);
+    fs_writef("{");
+
+    fs_tabular();
+
+    fs_writef("%s++;", name_array[curr_depth]);
     if (stop_conditions_int[curr_depth - 1] == 0)
     {
-        sprintf(tmp, "\t\t%s = %s - 1;\n", name_array[curr_depth + 1], name_array[curr_depth]);
+        fs_writef("%s = %s - 1;", name_array[curr_depth + 1], name_array[curr_depth]);
     }
     else
     {
-        sprintf(tmp, "\t\t%s = %s + 1;\n", name_array[curr_depth + 1], name_array[curr_depth]);
+        fs_writef("%s = %s + 1;", name_array[curr_depth + 1], name_array[curr_depth]);
     }
-    strcat(outputString, tmp);
-    increment(curr_depth - 1, outer_var_bounds, name_array, outputString, stop_conditions, stop_conditions_int, options);
-    strcat(outputString, "\t}\n");
-    free(tmp);
+    increment(curr_depth - 1, outer_var_bounds, name_array, stop_conditions, stop_conditions_int, options);
+
+    fs_untabular();
+
+    fs_writef("}");
 }
 
-char *
-write_increment_section(TCD_Boundary boundary, struct clast_expr *stop_conditions[], int *stop_conditions_int, CloogOptions *options)
+void write_increment_section(TCD_Boundary boundary, struct clast_expr *stop_conditions[], int *stop_conditions_int, CloogOptions *options)
 {
-    char *outputString = (char *)malloc(1024 * sizeof(char));
-
     char *outer_var = boundary->outerLoopVar;
     char *outer_var_bounds = boundary->outerLoopUpperBound;
     char *iteration_domains = boundary->iterationDomainsString;
     char **name_array = boundary->nameArray;
 
-    outputString[0] = '\0';
-
     int max_depth = tcdFlowData->collapseParameters[boundary_index];
-    sprintf(outputString, "\n\t%s++;", name_array[max_depth]);
-    increment(max_depth - 1, outer_var_bounds, name_array, outputString, stop_conditions, stop_conditions_int, options);
-
-    return outputString;
+    fs_tabular();
+    fs_writef("%s++;", name_array[max_depth]);
+    increment(max_depth - 1, outer_var_bounds, name_array, stop_conditions, stop_conditions_int, options);
+    fs_untabular();
 }
 
-void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Boundary boundary, FILE *outputFile)
+void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Boundary boundary)
 {
     // Initialisation code
-    fprintf(outputFile, "%s", write_init_section(boundary));
+    write_init_section(boundary);
 
     // Insert the actual unchanged code
     FILE *tmp = fopen("tmp.c", "w+");
@@ -279,16 +260,17 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
 
     string[fsize] = 0;
 
-    tabString(outputFile, string, fsize);
+    fs_tabular();
+    fs_writef(string);
+    fs_untabular();
 
     // Increment
-    char *increment = write_increment_section(boundary, stop_conditions, stop_conditions_int, options);
-    fprintf(outputFile, "%s", increment);
+    write_increment_section(boundary, stop_conditions, stop_conditions_int, options);
 
     // Finalisation code
-    fprintf(outputFile, "}\n\n");
+    fs_writef("}\n\n");
 
-    fprintf(outputFile, "//end//\n");
+    fs_writef("//end//\n");
 }
 
 void generateCode(TCD_BoundaryList boundaryList)
@@ -311,14 +293,7 @@ void generateCode(TCD_BoundaryList boundaryList)
     strcpy(outputFilename, INTERMEDIATE_FILENAME);
     strcat(outputFilename, ".c");
 
-    FILE *outputFile = fopen(outputFilename, "w+");
-
-    if (outputFile == NULL)
-    {
-        fprintf(stderr, "Error: Unable to open file %s\n", outputFilename);
-        exit(EXIT_FAILURE);
-    }
-
+    fs_open(outputFilename);
     // generation
     TCD_Boundary boundary = boundaryList->first;
     while (boundary != NULL)
@@ -341,7 +316,7 @@ void generateCode(TCD_BoundaryList boundaryList)
             exit(EXIT_FAILURE);
         }
 
-        generateCodeSegment(root, options, boundary, outputFile);
+        generateCodeSegment(root, options, boundary);
 
         // Next boundary
         boundary = boundary->next;
@@ -349,7 +324,7 @@ void generateCode(TCD_BoundaryList boundaryList)
         boundary_index++;
     }
 
-    fclose(outputFile);
+    fs_close();
 }
 
 void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundary_index)

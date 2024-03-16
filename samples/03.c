@@ -14,11 +14,14 @@ int main()
 			(void)i;
 #pragma endtrahrhe
 	printf("code between 2 collapse directives");
-#pragma trahrhe collapse(2)
+#pragma trahrhe collapse(3)
 	for (i = 0; i < MAX_I; i++)
 		for (j = i; j < MAX_J; j++)
 			for (k = 98; k > M; k--)
+			{
 				(void)i;
+				A[i][j][k] = B[i][j][k];
+			}
 #pragma endtrahrhe
 	return 0;
 }
