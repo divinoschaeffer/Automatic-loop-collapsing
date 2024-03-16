@@ -173,18 +173,6 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
     boundary->iteratorDependenciesArray[depth] = (char **)calloc(statement->domain->nb_rows, sizeof(char *));
     boundary->iteratorDependenciesArray[depth] = extractVariables(relation_buffer);
 #pragma endregion
-
-#pragma region clean up dependencies array
-// for (int j = 0; j < MAX_VARIABLES; j++)
-// {
-//   if (strcmp(boundary->iteratorDependenciesArray[depth][j], "") == 0)
-//     break;
-//   if (strcmp(boundary->iteratorDependenciesArray[depth][j], iterators[0]) != 0 && strcmp(boundary->iteratorDependenciesArray[depth][j], iterators[1]) != 0)
-//   {
-//     boundary->iteratorDependenciesArray[depth][j] = "";
-//   }
-// }
-#pragma endregion
   }
 
   strcat(unuaryUnion, " }");
@@ -196,16 +184,6 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
   strcpy(iterationDomainsUnion->iterationDomain, unuaryUnion);
 
   boundary->nameArray = name_array;
-
-  // Free the array of strings.
-  // if (name_array != NULL)
-  // {
-  //   for (i = 0; i < statement->domain->nb_columns; i++)
-  //     free(name_array[i]);
-  //   free(name_array);
-  // }
-  // free(unionList);
-  // free(unuaryUnion);
 
   if (boundary->firstIterDomainOfUnion->first == NULL)
   {
@@ -249,13 +227,6 @@ TCD_BoundaryList getBoundaries()
     return boundaryHead;
   }
 
-  // if (osl_scop_check_compatible_scoplib(scop) == 0) {
-  //   OSL_error("SCoP integrity check failed. Something may go wrong.");
-  //   exit(1);
-  // }
-
-  // Generate the names for the various dimensions.
-
   osl_statement_p statement;
 
   while (scop != NULL)
@@ -285,21 +256,6 @@ TCD_BoundaryList getBoundaries()
       iterators_backup = names->iterators;
       names->iterators = body->iterators;
     }
-
-    // osl_util_print_provided(
-    //     stdout, osl_generic_has_URI(scop->parameters, OSL_URI_STRINGS),
-    //     "Parameters are");
-
-    // if (scop->parameters)
-    // {
-    //   fprintf(stdout, "# Parameter names\n");
-    //   osl_strings_print(stdout, scop->parameters->data);
-    // }
-
-    // fprintf(stdout, "\n# Number of statements\n");
-    // fprintf(stdout, "%d\n\n", osl_statement_number(scop->statement));
-
-    // osl_statement_pprint_scoplib(stdout, scop->statement, names);
 
     statement = scop->statement;
     TCD_Boundary currentBoundary = getBoundary(statement, names);
@@ -332,7 +288,6 @@ TCD_BoundaryList getBoundaries()
       osl_strings_free(names->arrays);
       names->arrays = arrays_backup;
     }
-
     scop = scop->next;
   }
 

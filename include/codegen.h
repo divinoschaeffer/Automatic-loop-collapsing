@@ -16,6 +16,7 @@
 #include "flow.h"
 #include "data.h"
 #include "format_helper.h"
+#include "fs.h"
 
 /**
  * @brief Computes the new SCoP structure using the scop in global flow and the boundary list

@@ -20,6 +20,7 @@
  * @param fsize
  */
 void tabString(FILE *file, char *string, long fsize);
+char *tabStringReturn(char *string, long fsize);
 
 int digit_check(char key[]);
 
