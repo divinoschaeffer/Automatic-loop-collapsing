@@ -423,9 +423,19 @@ void mergeGeneratedCode()
 {
     char *command = (char *)malloc(1024 * sizeof(char));
     char *pwd = (char *)malloc(100 * sizeof(char));
+    char *outputFilename = (char *)malloc(1024 * sizeof(char));
+
+    // take only the name not the path
+    strcpy(outputFilename, tcdFlowData->outputFile);
+    char *token = strtok(outputFilename, "/");
+    while (token != NULL)
+    {
+        strcpy(outputFilename, token);
+        token = strtok(NULL, "/");
+    }
 
     getcwd(pwd, 100);
-    sprintf(command, "%s/fusion/fusion.sh %s %s.c '#include \"%s.h\"' %s.c", pwd, tcdFlowData->entryFile, INTERMEDIATE_FILENAME, tcdFlowData->outputFile, tcdFlowData->outputFile);
+    sprintf(command, "%s/fusion/fusion.sh %s %s.c '#include \"%s.h\"' %s.c", pwd, tcdFlowData->entryFile, INTERMEDIATE_FILENAME, outputFilename, tcdFlowData->outputFile);
 
     system(command);
 

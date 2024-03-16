@@ -10,3 +10,4 @@ Pourcent2Mod
 *.source.*
 out
 out.*
+tests/build

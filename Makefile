@@ -3,7 +3,7 @@ ROOTDIR = $(shell pwd)
 
 # CFLAGS  = -g -Wall -I$(ROOTDIR)/clan/include -L$(ROOTDIR)/clan -I$(ROOTDIR)/clan/osl/include -L$(ROOTDIR)/clan/osl
 CFLAGS  = -losl -lclan -lisl -Iinclude -Lcloog -Icloog/include -lcloog-isl -g
-OUTPUT_DIR = .dist
+OUTPUT_DIR = build
 
 TARGET = collapse
 
