@@ -9,7 +9,7 @@
 - [ntl](https://github.com/libntl/ntl.git)
 - [Barvinok](https://repo.or.cz/barvinok.git)
 - [trahrhe](https://webpages.gitlabpages.inria.fr/trahrhe/download)
-- [osl]()
+- [osl](https://icps.u-strasbg.fr/people/bastoul/public_html/development/openscop/)
 - [clan](https://github.com/periscop/clan.git)
 - [cloog](http://www.cloog.org/)
 
