@@ -123,6 +123,8 @@ static void kernel_correlation(int m, int n,
     }
     #pragma endtrahrhe
 
+    polybench_stop_instruments;
+
     corr[_PB_M - 1][_PB_M - 1] = SCALAR_VAL(1.0);
 }
 
