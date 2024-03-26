@@ -13,6 +13,11 @@
  */
 TCD_FlowData *tcdFlowData;
 
+/**
+ * @brief Initializes the TCD_FlowData structure
+ * @param inputFilename
+ * @param outputFilename
+ */
 void initTcdFlow(char *inputFilename, char *outputFilename)
 {
     tcdFlowData = (TCD_FlowData *)malloc(sizeof(TCD_FlowData));
@@ -46,6 +51,10 @@ void initTcdFlow(char *inputFilename, char *outputFilename)
     free(bash_command);
 }
 
+/**
+ * @brief Ends the TCD_FlowData structure
+ * @details Ends the TCD_FlowData structure by freeing the memory allocated
+ */
 void endTcdFlow(void)
 {
     free(tcdFlowData);

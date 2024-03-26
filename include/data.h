@@ -15,7 +15,6 @@
 #include <ctype.h>
 
 #include "flow.h"
-#include "hashtable.h"
 #include "format_helper.h"
 
 /**
@@ -76,11 +75,6 @@ struct boundary
    */
   char **nameArray;
   /**
-   * @deprecated
-   * @brief Dependencies hashtable
-   */
-  struct nlist *hashTable;
-  /**
    * @brief Next loop boundaries
    */
   struct boundary *next;
@@ -124,6 +118,14 @@ void printBoundaries(TCD_BoundaryList boundaryList);
  */
 TCD_Boundary copyBoundary(TCD_Boundary original);
 
+/**
+ * @brief Get variables real "strings" from the scop
+ * @details those strings are computed by the osl library and
+ * we need to parse them to get the real names
+ * @param relation
+ * @param names
+ * @return char**
+ */
 static char **osl_relation_strings(osl_relation_p relation, osl_names_p names)
 {
   char **strings;
