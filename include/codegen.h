@@ -24,10 +24,21 @@
  */
 void generateCode(TCD_BoundaryList boundaryList);
 
+/**
+ * @brief Generates the header file
+ * @param boundaryList The boundary list
+ */
 void generateHeaderFile(TCD_BoundaryList boundaryList);
 
+/**
+ * @brief Generates the source file
+ * @param boundaryList The boundary list
+ */
 void mergeGeneratedCode();
 
+/**
+ * @brief Removes the temporary files
+ */
 void removeTemporaryFiles();
 
 CloogState *cloog_isl_state_malloc(struct isl_ctx *ctx);

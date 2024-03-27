@@ -49,6 +49,10 @@ TCD_IterationDomain copyIterationDomain(TCD_IterationDomain original)
   return copy;
 }
 
+/// @brief Returns the boundary of an OSL statement
+/// @param statement
+/// @param names
+/// @return
 TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
 {
   int i;
@@ -203,6 +207,10 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
   return boundary;
 }
 
+/**
+ * @brief Get the Boundaries object
+ * @return TCD_BoundaryList
+ */
 TCD_BoundaryList getBoundaries()
 {
   TCD_BoundaryList boundaryHead = (TCD_BoundaryList)malloc(sizeof(struct boundaryList));
@@ -296,6 +304,11 @@ TCD_BoundaryList getBoundaries()
   return boundaryHead;
 }
 
+/**
+ * @brief Copies a boundary
+ * @param original
+ * @return TCD_Boundary
+ */
 TCD_Boundary copyBoundary(TCD_Boundary original)
 {
   if (original == NULL)
@@ -313,6 +326,10 @@ TCD_Boundary copyBoundary(TCD_Boundary original)
   return copy;
 }
 
+/**
+ * @brief Prints the boundaries
+ * @param boundaryList
+ */
 void printBoundaries(TCD_BoundaryList boundaryList)
 {
   TCD_Boundary boundary = copyBoundary(boundaryList->first);

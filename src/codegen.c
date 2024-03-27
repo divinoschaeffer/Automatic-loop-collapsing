@@ -14,6 +14,10 @@ extern TCD_FlowData *tcdFlowData;
 
 unsigned boundary_index = 0;
 
+/**
+ * @brief Writes the initialisation section of the generated code.
+ * @param boundary
+ */
 void write_init_section(TCD_Boundary boundary)
 {
     char *outer_var = boundary->outerLoopVar;
@@ -87,18 +91,13 @@ void write_init_section(TCD_Boundary boundary)
     fs_untabular();
 }
 
-char *take(int index, char *string)
-{
-    char *tmp = (char *)malloc(1024 * sizeof(char));
-    strcpy(tmp, string);
-    char *token = strtok(tmp, ",");
-    for (int i = 0; i < index; i++)
-    {
-        token = strtok(NULL, ",");
-    }
-    return token;
-}
-
+/// @brief Recursive function to increment the loop variables
+/// @param curr_depth
+/// @param outer_var_bounds
+/// @param name_array
+/// @param stop_conditions
+/// @param stop_conditions_int
+/// @param options
 void increment(int curr_depth,
                char *outer_var_bounds,
                char **name_array,
@@ -161,6 +160,12 @@ void increment(int curr_depth,
     fs_writef("}");
 }
 
+/// @brief Writes the increment section of the generated code
+/// @details The increment section is the part of the code that increments the loop variables
+/// @param boundary
+/// @param stop_conditions
+/// @param stop_conditions_int
+/// @param options
 void write_increment_section(TCD_Boundary boundary, struct clast_expr *stop_conditions[], int *stop_conditions_int, CloogOptions *options)
 {
     char *outer_var = boundary->outerLoopVar;
@@ -175,6 +180,10 @@ void write_increment_section(TCD_Boundary boundary, struct clast_expr *stop_cond
     fs_untabular();
 }
 
+/// @brief Generates the code segment for a given boundary
+/// @param root
+/// @param options
+/// @param boundary
 void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Boundary boundary)
 {
     // Initialisation code
@@ -271,6 +280,8 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
     fs_writef("//end//\n");
 }
 
+/// @brief Generates the output code where loops are collapsed
+/// @param boundaryList
 void generateCode(TCD_BoundaryList boundaryList)
 {
     osl_scop_p scop = tcdFlowData->scop;
@@ -326,6 +337,10 @@ void generateCode(TCD_BoundaryList boundaryList)
     fs_close();
 }
 
+/// @brief Generates the header file for a given boundary
+/// @param boundary
+/// @param outputFile
+/// @param boundary_index
 void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundary_index)
 {
     char *isl_domain = boundary->firstIterDomainOfUnion->first->iterationDomain;
@@ -370,6 +385,8 @@ void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundar
     free(bash_command);
 }
 
+/// @brief Generates the header file for all the boundaries of a given input
+/// @param boundaryList
 void generateHeaderFile(TCD_BoundaryList boundaryList)
 {
     char *headerFilename = (char *)malloc(1024 * sizeof(char));
@@ -393,6 +410,8 @@ void generateHeaderFile(TCD_BoundaryList boundaryList)
     }
 }
 
+/// @brief Merges the generated code with the original code
+/// @details Uses a shell script
 void mergeGeneratedCode()
 {
     char *command = (char *)malloc(1024 * sizeof(char));
@@ -417,6 +436,7 @@ void mergeGeneratedCode()
     free(pwd);
 }
 
+/// @brief Removes the temporary files
 void removeTemporaryFiles()
 {
     char *command = (char *)malloc(1024 * sizeof(char));
