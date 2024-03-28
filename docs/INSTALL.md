@@ -41,4 +41,3 @@ If you are having trouble with the installation of the library, you can try the 
 If your machine is missing `autoreconf` command, you can install it by running the following command:
 
 `apt-get install dh-autoreconf`
-
