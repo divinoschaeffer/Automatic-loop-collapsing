@@ -1,0 +1,104 @@
+\hypertarget{fs_8c}{}\doxysection{src/fs.c File Reference}
+\label{fs_8c}\index{src/fs.c@{src/fs.c}}
+
+
+File System.  
+
+
+{\ttfamily \#include \char`\"{}fs.\+h\char`\"{}}\newline
+Include dependency graph for fs.\+c\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{fs_8c_aecffc39d492ece01901afc0e72698763}{fs\+\_\+open}} (char $\ast$filename)
+\begin{DoxyCompactList}\small\item\em Open file for writing. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{fs_8c_a870303987512768fbbf109e94ec09b06}\label{fs_8c_a870303987512768fbbf109e94ec09b06}} 
+void \mbox{\hyperlink{fs_8c_a870303987512768fbbf109e94ec09b06}{fs\+\_\+close}} ()
+\begin{DoxyCompactList}\small\item\em Close file. \end{DoxyCompactList}\item 
+char $\ast$ \mbox{\hyperlink{fs_8c_a86fde711b6d57b11e14cc89cb78dcfc9}{fs\+\_\+rewind}} ()
+\item 
+void \mbox{\hyperlink{fs_8c_adb3ba83e7a60d941e0e84152e7325d2a}{fs\+\_\+writef}} (char $\ast$str,...)
+\begin{DoxyCompactList}\small\item\em Write string to file with new line with format. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{fs_8c_a3e41fdf7a5209f86b0aec5f4034afc32}\label{fs_8c_a3e41fdf7a5209f86b0aec5f4034afc32}} 
+void {\bfseries fs\+\_\+writefl} (char $\ast$str,...)
+\item 
+void \mbox{\hyperlink{fs_8c_a94a2f0df9b029548a3d2a9d8a0f168d4}{fs\+\_\+writeft}} (char $\ast$str,...)
+\begin{DoxyCompactList}\small\item\em Write string to file with new line and tabular with format. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{fs_8c_aa9383b4facd7550353e68ea6ef48fde6}\label{fs_8c_aa9383b4facd7550353e68ea6ef48fde6}} 
+void \mbox{\hyperlink{fs_8c_aa9383b4facd7550353e68ea6ef48fde6}{fs\+\_\+tabular}} ()
+\begin{DoxyCompactList}\small\item\em Write a tabular to file before each line till the opposite is called. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{fs_8c_ad7d0c5098ab66c2660f4476074b82e38}\label{fs_8c_ad7d0c5098ab66c2660f4476074b82e38}} 
+void \mbox{\hyperlink{fs_8c_ad7d0c5098ab66c2660f4476074b82e38}{fs\+\_\+untabular}} ()
+\begin{DoxyCompactList}\small\item\em Write a tabular to file before each line till the opposite is called. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{fs_8c_aff692fbc5c9f70125ef940daaf4c7190}\label{fs_8c_aff692fbc5c9f70125ef940daaf4c7190}} 
+FILE $\ast$ {\bfseries fs}
+\item 
+\mbox{\Hypertarget{fs_8c_a6a418511d5bc6d79f56b2a3271abb705}\label{fs_8c_a6a418511d5bc6d79f56b2a3271abb705}} 
+int {\bfseries tabular} = 0
+\item 
+\mbox{\Hypertarget{fs_8c_a41d002fb8bf5f7d8d16f5add34732899}\label{fs_8c_a41d002fb8bf5f7d8d16f5add34732899}} 
+char $\ast$ {\bfseries outputname}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+File System. 
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{fs_8c_aecffc39d492ece01901afc0e72698763}\label{fs_8c_aecffc39d492ece01901afc0e72698763}} 
+\index{fs.c@{fs.c}!fs\_open@{fs\_open}}
+\index{fs\_open@{fs\_open}!fs.c@{fs.c}}
+\doxysubsubsection{\texorpdfstring{fs\_open()}{fs\_open()}}
+{\footnotesize\ttfamily void fs\+\_\+open (\begin{DoxyParamCaption}\item[{char $\ast$}]{filename }\end{DoxyParamCaption})}
+
+
+
+Open file for writing. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{fs_8c_a86fde711b6d57b11e14cc89cb78dcfc9}\label{fs_8c_a86fde711b6d57b11e14cc89cb78dcfc9}} 
+\index{fs.c@{fs.c}!fs\_rewind@{fs\_rewind}}
+\index{fs\_rewind@{fs\_rewind}!fs.c@{fs.c}}
+\doxysubsubsection{\texorpdfstring{fs\_rewind()}{fs\_rewind()}}
+{\footnotesize\ttfamily char$\ast$ fs\+\_\+rewind (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+reads the file\textquotesingle{}s content and positions the stream at the beginning of the file returns the content file inside a buffer \mbox{\Hypertarget{fs_8c_adb3ba83e7a60d941e0e84152e7325d2a}\label{fs_8c_adb3ba83e7a60d941e0e84152e7325d2a}} 
+\index{fs.c@{fs.c}!fs\_writef@{fs\_writef}}
+\index{fs\_writef@{fs\_writef}!fs.c@{fs.c}}
+\doxysubsubsection{\texorpdfstring{fs\_writef()}{fs\_writef()}}
+{\footnotesize\ttfamily void fs\+\_\+writef (\begin{DoxyParamCaption}\item[{char $\ast$}]{str,  }\item[{}]{... }\end{DoxyParamCaption})}
+
+
+
+Write string to file with new line with format. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{fs_8c_a94a2f0df9b029548a3d2a9d8a0f168d4}\label{fs_8c_a94a2f0df9b029548a3d2a9d8a0f168d4}} 
+\index{fs.c@{fs.c}!fs\_writeft@{fs\_writeft}}
+\index{fs\_writeft@{fs\_writeft}!fs.c@{fs.c}}
+\doxysubsubsection{\texorpdfstring{fs\_writeft()}{fs\_writeft()}}
+{\footnotesize\ttfamily void fs\+\_\+writeft (\begin{DoxyParamCaption}\item[{char $\ast$}]{str,  }\item[{}]{... }\end{DoxyParamCaption})}
+
+
+
+Write string to file with new line and tabular with format. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & \\
+\hline
+\end{DoxyParams}

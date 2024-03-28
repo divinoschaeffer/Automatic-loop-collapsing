@@ -1,0 +1,209 @@
+\hypertarget{codegen_8c}{}\doxysection{src/codegen.c File Reference}
+\label{codegen_8c}\index{src/codegen.c@{src/codegen.c}}
+
+
+Edits an Open\+SCoP representation to generate an output code where loops are collapsed.  
+
+
+{\ttfamily \#include \char`\"{}codegen.\+h\char`\"{}}\newline
+Include dependency graph for codegen.\+c\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{codegen_8c_aca3914ecec7c77a982ca47f0a568fae5}{write\+\_\+init\+\_\+section}} (\mbox{\hyperlink{structboundary}{TCD\+\_\+\+Boundary}} \mbox{\hyperlink{structboundary}{boundary}})
+\begin{DoxyCompactList}\small\item\em Writes the initialisation section of the generated code. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{codegen_8c_a7f1bdd6fc603aca3f6aed4aa869ea27d}{increment}} (int curr\+\_\+depth, char $\ast$outer\+\_\+var\+\_\+bounds, char $\ast$$\ast$name\+\_\+array, struct clast\+\_\+expr $\ast$stop\+\_\+conditions\mbox{[}$\,$\mbox{]}, int $\ast$stop\+\_\+conditions\+\_\+int, Cloog\+Options $\ast$options)
+\begin{DoxyCompactList}\small\item\em Recursive function to increment the loop variables. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{codegen_8c_ac120f4050403bc29719f6a89c08780e2}{write\+\_\+increment\+\_\+section}} (\mbox{\hyperlink{structboundary}{TCD\+\_\+\+Boundary}} \mbox{\hyperlink{structboundary}{boundary}}, struct clast\+\_\+expr $\ast$stop\+\_\+conditions\mbox{[}$\,$\mbox{]}, int $\ast$stop\+\_\+conditions\+\_\+int, Cloog\+Options $\ast$options)
+\begin{DoxyCompactList}\small\item\em Writes the increment section of the generated code. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{codegen_8c_ac0f934c723b24b1866515f45f1046607}{generate\+Code\+Segment}} (struct clast\+\_\+stmt $\ast$root, Cloog\+Options $\ast$options, \mbox{\hyperlink{structboundary}{TCD\+\_\+\+Boundary}} \mbox{\hyperlink{structboundary}{boundary}})
+\begin{DoxyCompactList}\small\item\em Generates the code segment for a given boundary. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{codegen_8c_a6e42d4503326bc826aaea262ddfe152a}{generate\+Code}} (\mbox{\hyperlink{structboundaryList}{TCD\+\_\+\+Boundary\+List}} \mbox{\hyperlink{structboundaryList}{boundary\+List}})
+\begin{DoxyCompactList}\small\item\em Generates the output code where loops are collapsed. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{codegen_8c_a03fd076689c1638f551278c39f690a03}{generate\+Boundary\+Header}} (\mbox{\hyperlink{structboundary}{TCD\+\_\+\+Boundary}} \mbox{\hyperlink{structboundary}{boundary}}, FILE $\ast$output\+File, int boundary\+\_\+index)
+\begin{DoxyCompactList}\small\item\em Generates the header file for a given boundary. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{codegen_8c_a98d847664a4de43f29f6cb2f519ec381}{generate\+Header\+File}} (\mbox{\hyperlink{structboundaryList}{TCD\+\_\+\+Boundary\+List}} \mbox{\hyperlink{structboundaryList}{boundary\+List}})
+\begin{DoxyCompactList}\small\item\em Generates the header file for all the boundaries of a given input. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{codegen_8c_af8b2c2561e74077407ec3c1d3c1d7d8a}{merge\+Generated\+Code}} ()
+\begin{DoxyCompactList}\small\item\em Merges the generated code with the original code. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{codegen_8c_a013b6498f1f2c0fb19fc5e9ba7099c46}\label{codegen_8c_a013b6498f1f2c0fb19fc5e9ba7099c46}} 
+void \mbox{\hyperlink{codegen_8c_a013b6498f1f2c0fb19fc5e9ba7099c46}{remove\+Temporary\+Files}} ()
+\begin{DoxyCompactList}\small\item\em Removes the temporary files. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{codegen_8c_aff692fbc5c9f70125ef940daaf4c7190}\label{codegen_8c_aff692fbc5c9f70125ef940daaf4c7190}} 
+FILE $\ast$ {\bfseries fs}
+\item 
+\mbox{\Hypertarget{codegen_8c_a03807cd42261df72ab3da49e1f954b38}\label{codegen_8c_a03807cd42261df72ab3da49e1f954b38}} 
+\mbox{\hyperlink{structTCD__FlowData}{TCD\+\_\+\+Flow\+Data}} $\ast$ \mbox{\hyperlink{codegen_8c_a03807cd42261df72ab3da49e1f954b38}{tcd\+Flow\+Data}}
+\begin{DoxyCompactList}\small\item\em TCD\+\_\+\+Flow is global -\/ all C sources that use it must declare it as extern. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{codegen_8c_a85725b53243754d82004aec68c0fdaba}\label{codegen_8c_a85725b53243754d82004aec68c0fdaba}} 
+unsigned {\bfseries boundary\+\_\+index} = 0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Edits an Open\+SCoP representation to generate an output code where loops are collapsed. 
+
+\begin{DoxyAuthor}{Author}
+SORGHO Nongma 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2024-\/02-\/09 
+\end{DoxyDate}
+\begin{DoxyCopyright}{Copyright}
+Copyright (c) 2024 
+\end{DoxyCopyright}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{codegen_8c_a03fd076689c1638f551278c39f690a03}\label{codegen_8c_a03fd076689c1638f551278c39f690a03}} 
+\index{codegen.c@{codegen.c}!generateBoundaryHeader@{generateBoundaryHeader}}
+\index{generateBoundaryHeader@{generateBoundaryHeader}!codegen.c@{codegen.c}}
+\doxysubsubsection{\texorpdfstring{generateBoundaryHeader()}{generateBoundaryHeader()}}
+{\footnotesize\ttfamily void generate\+Boundary\+Header (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboundary}{TCD\+\_\+\+Boundary}}}]{boundary,  }\item[{FILE $\ast$}]{output\+File,  }\item[{int}]{boundary\+\_\+index }\end{DoxyParamCaption})}
+
+
+
+Generates the header file for a given boundary. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em boundary} & \\
+\hline
+{\em output\+File} & \\
+\hline
+{\em boundary\+\_\+index} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{codegen_8c_a6e42d4503326bc826aaea262ddfe152a}\label{codegen_8c_a6e42d4503326bc826aaea262ddfe152a}} 
+\index{codegen.c@{codegen.c}!generateCode@{generateCode}}
+\index{generateCode@{generateCode}!codegen.c@{codegen.c}}
+\doxysubsubsection{\texorpdfstring{generateCode()}{generateCode()}}
+{\footnotesize\ttfamily void generate\+Code (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboundaryList}{TCD\+\_\+\+Boundary\+List}}}]{boundary\+List }\end{DoxyParamCaption})}
+
+
+
+Generates the output code where loops are collapsed. 
+
+Computes the new SCoP structure using the scop in global flow and the boundary list.
+
+
+\begin{DoxyParams}{Parameters}
+{\em \mbox{\hyperlink{structboundaryList}{boundary\+List}}} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{codegen_8c_ac0f934c723b24b1866515f45f1046607}\label{codegen_8c_ac0f934c723b24b1866515f45f1046607}} 
+\index{codegen.c@{codegen.c}!generateCodeSegment@{generateCodeSegment}}
+\index{generateCodeSegment@{generateCodeSegment}!codegen.c@{codegen.c}}
+\doxysubsubsection{\texorpdfstring{generateCodeSegment()}{generateCodeSegment()}}
+{\footnotesize\ttfamily void generate\+Code\+Segment (\begin{DoxyParamCaption}\item[{struct clast\+\_\+stmt $\ast$}]{root,  }\item[{Cloog\+Options $\ast$}]{options,  }\item[{\mbox{\hyperlink{structboundary}{TCD\+\_\+\+Boundary}}}]{boundary }\end{DoxyParamCaption})}
+
+
+
+Generates the code segment for a given boundary. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em root} & \\
+\hline
+{\em options} & \\
+\hline
+{\em boundary} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{codegen_8c_a98d847664a4de43f29f6cb2f519ec381}\label{codegen_8c_a98d847664a4de43f29f6cb2f519ec381}} 
+\index{codegen.c@{codegen.c}!generateHeaderFile@{generateHeaderFile}}
+\index{generateHeaderFile@{generateHeaderFile}!codegen.c@{codegen.c}}
+\doxysubsubsection{\texorpdfstring{generateHeaderFile()}{generateHeaderFile()}}
+{\footnotesize\ttfamily void generate\+Header\+File (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboundaryList}{TCD\+\_\+\+Boundary\+List}}}]{boundary\+List }\end{DoxyParamCaption})}
+
+
+
+Generates the header file for all the boundaries of a given input. 
+
+Generates the header file.
+
+
+\begin{DoxyParams}{Parameters}
+{\em \mbox{\hyperlink{structboundaryList}{boundary\+List}}} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{codegen_8c_a7f1bdd6fc603aca3f6aed4aa869ea27d}\label{codegen_8c_a7f1bdd6fc603aca3f6aed4aa869ea27d}} 
+\index{codegen.c@{codegen.c}!increment@{increment}}
+\index{increment@{increment}!codegen.c@{codegen.c}}
+\doxysubsubsection{\texorpdfstring{increment()}{increment()}}
+{\footnotesize\ttfamily void increment (\begin{DoxyParamCaption}\item[{int}]{curr\+\_\+depth,  }\item[{char $\ast$}]{outer\+\_\+var\+\_\+bounds,  }\item[{char $\ast$$\ast$}]{name\+\_\+array,  }\item[{struct clast\+\_\+expr $\ast$}]{stop\+\_\+conditions\mbox{[}$\,$\mbox{]},  }\item[{int $\ast$}]{stop\+\_\+conditions\+\_\+int,  }\item[{Cloog\+Options $\ast$}]{options }\end{DoxyParamCaption})}
+
+
+
+Recursive function to increment the loop variables. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em curr\+\_\+depth} & \\
+\hline
+{\em outer\+\_\+var\+\_\+bounds} & \\
+\hline
+{\em name\+\_\+array} & \\
+\hline
+{\em stop\+\_\+conditions} & \\
+\hline
+{\em stop\+\_\+conditions\+\_\+int} & \\
+\hline
+{\em options} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{codegen_8c_af8b2c2561e74077407ec3c1d3c1d7d8a}\label{codegen_8c_af8b2c2561e74077407ec3c1d3c1d7d8a}} 
+\index{codegen.c@{codegen.c}!mergeGeneratedCode@{mergeGeneratedCode}}
+\index{mergeGeneratedCode@{mergeGeneratedCode}!codegen.c@{codegen.c}}
+\doxysubsubsection{\texorpdfstring{mergeGeneratedCode()}{mergeGeneratedCode()}}
+{\footnotesize\ttfamily void merge\+Generated\+Code (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Merges the generated code with the original code. 
+
+Generates the source file.
+
+Uses a shell script \mbox{\Hypertarget{codegen_8c_ac120f4050403bc29719f6a89c08780e2}\label{codegen_8c_ac120f4050403bc29719f6a89c08780e2}} 
+\index{codegen.c@{codegen.c}!write\_increment\_section@{write\_increment\_section}}
+\index{write\_increment\_section@{write\_increment\_section}!codegen.c@{codegen.c}}
+\doxysubsubsection{\texorpdfstring{write\_increment\_section()}{write\_increment\_section()}}
+{\footnotesize\ttfamily void write\+\_\+increment\+\_\+section (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboundary}{TCD\+\_\+\+Boundary}}}]{boundary,  }\item[{struct clast\+\_\+expr $\ast$}]{stop\+\_\+conditions\mbox{[}$\,$\mbox{]},  }\item[{int $\ast$}]{stop\+\_\+conditions\+\_\+int,  }\item[{Cloog\+Options $\ast$}]{options }\end{DoxyParamCaption})}
+
+
+
+Writes the increment section of the generated code. 
+
+The increment section is the part of the code that increments the loop variables 
+\begin{DoxyParams}{Parameters}
+{\em boundary} & \\
+\hline
+{\em stop\+\_\+conditions} & \\
+\hline
+{\em stop\+\_\+conditions\+\_\+int} & \\
+\hline
+{\em options} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{codegen_8c_aca3914ecec7c77a982ca47f0a568fae5}\label{codegen_8c_aca3914ecec7c77a982ca47f0a568fae5}} 
+\index{codegen.c@{codegen.c}!write\_init\_section@{write\_init\_section}}
+\index{write\_init\_section@{write\_init\_section}!codegen.c@{codegen.c}}
+\doxysubsubsection{\texorpdfstring{write\_init\_section()}{write\_init\_section()}}
+{\footnotesize\ttfamily void write\+\_\+init\+\_\+section (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboundary}{TCD\+\_\+\+Boundary}}}]{boundary }\end{DoxyParamCaption})}
+
+
+
+Writes the initialisation section of the generated code. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em boundary} & \\
+\hline
+\end{DoxyParams}

@@ -1,0 +1,87 @@
+\hypertarget{flow_8h}{}\doxysection{include/flow.h File Reference}
+\label{flow_8h}\index{include/flow.h@{include/flow.h}}
+
+
+Data structures that represent the progress of the trahrhe collapsing process.  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$osl/osl.\+h$>$}\newline
+Include dependency graph for flow.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structTCD__FlowData}{TCD\+\_\+\+Flow\+Data}}
+\begin{DoxyCompactList}\small\item\em Computational data to be transported during the collapsing. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{flow_8h_acb99cbbff002d93ee123d4e10203bc5a}\label{flow_8h_acb99cbbff002d93ee123d4e10203bc5a}} 
+\#define {\bfseries SCOPED\+\_\+\+FILENAME}~\char`\"{}scope.\+source.\+scop\char`\"{}
+\item 
+\mbox{\Hypertarget{flow_8h_a21b468e91d9e7fda4c22bc37b8aec579}\label{flow_8h_a21b468e91d9e7fda4c22bc37b8aec579}} 
+\#define {\bfseries COLLAPSE\+\_\+\+PARAMETERS\+\_\+\+FILENAME}~\char`\"{}collapse\+\_\+parameter.\+source.\+txt\char`\"{}
+\item 
+\mbox{\Hypertarget{flow_8h_ace6148fb26545fd76c3df6fe580e9186}\label{flow_8h_ace6148fb26545fd76c3df6fe580e9186}} 
+\#define {\bfseries INTERMEDIATE\+\_\+\+FILENAME}~\char`\"{}intermediate.\+source\char`\"{}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{flow_8h_a734fc4d3408ff07599161aa705823d43}{init\+Tcd\+Flow}} (char $\ast$input\+Filename, char $\ast$output\+Filename)
+\begin{DoxyCompactList}\small\item\em Inits the Tcd\+\_\+\+Flow structure. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{flow_8h_a71f964a6f66ae8e0635da38604e9daa6}{end\+Tcd\+Flow}} ()
+\begin{DoxyCompactList}\small\item\em Destruct the Tcd\+\_\+\+Flow and frees all memories spaces linked to it. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Data structures that represent the progress of the trahrhe collapsing process. 
+
+\begin{DoxyAuthor}{Author}
+Nongma SORGHO 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2024-\/02-\/03 
+\end{DoxyDate}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{flow_8h_a71f964a6f66ae8e0635da38604e9daa6}\label{flow_8h_a71f964a6f66ae8e0635da38604e9daa6}} 
+\index{flow.h@{flow.h}!endTcdFlow@{endTcdFlow}}
+\index{endTcdFlow@{endTcdFlow}!flow.h@{flow.h}}
+\doxysubsubsection{\texorpdfstring{endTcdFlow()}{endTcdFlow()}}
+{\footnotesize\ttfamily void end\+Tcd\+Flow (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Destruct the Tcd\+\_\+\+Flow and frees all memories spaces linked to it. 
+
+Destruct the Tcd\+\_\+\+Flow and frees all memories spaces linked to it.
+
+Ends the \mbox{\hyperlink{structTCD__FlowData}{TCD\+\_\+\+Flow\+Data}} structure by freeing the memory allocated \mbox{\Hypertarget{flow_8h_a734fc4d3408ff07599161aa705823d43}\label{flow_8h_a734fc4d3408ff07599161aa705823d43}} 
+\index{flow.h@{flow.h}!initTcdFlow@{initTcdFlow}}
+\index{initTcdFlow@{initTcdFlow}!flow.h@{flow.h}}
+\doxysubsubsection{\texorpdfstring{initTcdFlow()}{initTcdFlow()}}
+{\footnotesize\ttfamily void init\+Tcd\+Flow (\begin{DoxyParamCaption}\item[{char $\ast$}]{input\+Filename,  }\item[{char $\ast$}]{output\+Filename }\end{DoxyParamCaption})}
+
+
+
+Inits the Tcd\+\_\+\+Flow structure. 
+
+Inits the Tcd\+\_\+\+Flow structure.
+
+
+\begin{DoxyParams}{Parameters}
+{\em input\+Filename} & \\
+\hline
+{\em output\+Filename} & \\
+\hline
+\end{DoxyParams}

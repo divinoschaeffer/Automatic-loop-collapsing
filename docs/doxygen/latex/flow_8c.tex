@@ -1,0 +1,71 @@
+\hypertarget{flow_8c}{}\doxysection{src/flow.c File Reference}
+\label{flow_8c}\index{src/flow.c@{src/flow.c}}
+
+
+Flow module implementation.  
+
+
+{\ttfamily \#include \char`\"{}flow.\+h\char`\"{}}\newline
+Include dependency graph for flow.\+c\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{flow_8c_a734fc4d3408ff07599161aa705823d43}{init\+Tcd\+Flow}} (char $\ast$input\+Filename, char $\ast$output\+Filename)
+\begin{DoxyCompactList}\small\item\em Initializes the \mbox{\hyperlink{structTCD__FlowData}{TCD\+\_\+\+Flow\+Data}} structure. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{flow_8c_a8547e91f18e63d7b76de55fb534694a2}{end\+Tcd\+Flow}} (void)
+\begin{DoxyCompactList}\small\item\em Ends the \mbox{\hyperlink{structTCD__FlowData}{TCD\+\_\+\+Flow\+Data}} structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{flow_8c_a03807cd42261df72ab3da49e1f954b38}\label{flow_8c_a03807cd42261df72ab3da49e1f954b38}} 
+\mbox{\hyperlink{structTCD__FlowData}{TCD\+\_\+\+Flow\+Data}} $\ast$ \mbox{\hyperlink{flow_8c_a03807cd42261df72ab3da49e1f954b38}{tcd\+Flow\+Data}}
+\begin{DoxyCompactList}\small\item\em TCD\+\_\+\+Flow is global -\/ all C sources that use it must declare it as extern. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Flow module implementation. 
+
+\begin{DoxyAuthor}{Author}
+Nongma SORGHO 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2024-\/02-\/03 
+\end{DoxyDate}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{flow_8c_a8547e91f18e63d7b76de55fb534694a2}\label{flow_8c_a8547e91f18e63d7b76de55fb534694a2}} 
+\index{flow.c@{flow.c}!endTcdFlow@{endTcdFlow}}
+\index{endTcdFlow@{endTcdFlow}!flow.c@{flow.c}}
+\doxysubsubsection{\texorpdfstring{endTcdFlow()}{endTcdFlow()}}
+{\footnotesize\ttfamily void end\+Tcd\+Flow (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Ends the \mbox{\hyperlink{structTCD__FlowData}{TCD\+\_\+\+Flow\+Data}} structure. 
+
+Destruct the Tcd\+\_\+\+Flow and frees all memories spaces linked to it.
+
+Ends the \mbox{\hyperlink{structTCD__FlowData}{TCD\+\_\+\+Flow\+Data}} structure by freeing the memory allocated \mbox{\Hypertarget{flow_8c_a734fc4d3408ff07599161aa705823d43}\label{flow_8c_a734fc4d3408ff07599161aa705823d43}} 
+\index{flow.c@{flow.c}!initTcdFlow@{initTcdFlow}}
+\index{initTcdFlow@{initTcdFlow}!flow.c@{flow.c}}
+\doxysubsubsection{\texorpdfstring{initTcdFlow()}{initTcdFlow()}}
+{\footnotesize\ttfamily void init\+Tcd\+Flow (\begin{DoxyParamCaption}\item[{char $\ast$}]{input\+Filename,  }\item[{char $\ast$}]{output\+Filename }\end{DoxyParamCaption})}
+
+
+
+Initializes the \mbox{\hyperlink{structTCD__FlowData}{TCD\+\_\+\+Flow\+Data}} structure. 
+
+Inits the Tcd\+\_\+\+Flow structure.
+
+
+\begin{DoxyParams}{Parameters}
+{\em input\+Filename} & \\
+\hline
+{\em output\+Filename} & \\
+\hline
+\end{DoxyParams}

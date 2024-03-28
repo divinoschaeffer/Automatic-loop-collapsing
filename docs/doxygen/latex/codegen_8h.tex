@@ -1,0 +1,114 @@
+\hypertarget{codegen_8h}{}\doxysection{include/codegen.h File Reference}
+\label{codegen_8h}\index{include/codegen.h@{include/codegen.h}}
+
+
+This file contains the code generation functions.  
+
+
+{\ttfamily \#include $<$osl/osl.\+h$>$}\newline
+{\ttfamily \#include $<$cloog/isl/cloog.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}flow.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}data.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}format\+\_\+helper.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}fs.\+h\char`\"{}}\newline
+Include dependency graph for codegen.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{codegen_8h_a6e42d4503326bc826aaea262ddfe152a}{generate\+Code}} (\mbox{\hyperlink{structboundaryList}{TCD\+\_\+\+Boundary\+List}} \mbox{\hyperlink{structboundaryList}{boundary\+List}})
+\begin{DoxyCompactList}\small\item\em Computes the new SCoP structure using the scop in global flow and the boundary list. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{codegen_8h_a98d847664a4de43f29f6cb2f519ec381}{generate\+Header\+File}} (\mbox{\hyperlink{structboundaryList}{TCD\+\_\+\+Boundary\+List}} \mbox{\hyperlink{structboundaryList}{boundary\+List}})
+\begin{DoxyCompactList}\small\item\em Generates the header file. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{codegen_8h_af8b2c2561e74077407ec3c1d3c1d7d8a}{merge\+Generated\+Code}} ()
+\begin{DoxyCompactList}\small\item\em Generates the source file. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{codegen_8h_a013b6498f1f2c0fb19fc5e9ba7099c46}\label{codegen_8h_a013b6498f1f2c0fb19fc5e9ba7099c46}} 
+void \mbox{\hyperlink{codegen_8h_a013b6498f1f2c0fb19fc5e9ba7099c46}{remove\+Temporary\+Files}} ()
+\begin{DoxyCompactList}\small\item\em Removes the temporary files. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{codegen_8h_a8a9a9fae5c415ccddc4436cd6564b5bc}\label{codegen_8h_a8a9a9fae5c415ccddc4436cd6564b5bc}} 
+Cloog\+State $\ast$ {\bfseries cloog\+\_\+isl\+\_\+state\+\_\+malloc} (struct isl\+\_\+ctx $\ast$ctx)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+This file contains the code generation functions. 
+
+\begin{DoxyAuthor}{Author}
+SORGHO Nongma 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2024-\/02-\/09 
+\end{DoxyDate}
+\begin{DoxyCopyright}{Copyright}
+Copyright (c) 2024 
+\end{DoxyCopyright}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{codegen_8h_a6e42d4503326bc826aaea262ddfe152a}\label{codegen_8h_a6e42d4503326bc826aaea262ddfe152a}} 
+\index{codegen.h@{codegen.h}!generateCode@{generateCode}}
+\index{generateCode@{generateCode}!codegen.h@{codegen.h}}
+\doxysubsubsection{\texorpdfstring{generateCode()}{generateCode()}}
+{\footnotesize\ttfamily void generate\+Code (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboundaryList}{TCD\+\_\+\+Boundary\+List}}}]{boundary\+List }\end{DoxyParamCaption})}
+
+
+
+Computes the new SCoP structure using the scop in global flow and the boundary list. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \mbox{\hyperlink{structboundaryList}{boundary\+List}}} & The boundary list\\
+\hline
+\end{DoxyParams}
+Computes the new SCoP structure using the scop in global flow and the boundary list.
+
+
+\begin{DoxyParams}{Parameters}
+{\em \mbox{\hyperlink{structboundaryList}{boundary\+List}}} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{codegen_8h_a98d847664a4de43f29f6cb2f519ec381}\label{codegen_8h_a98d847664a4de43f29f6cb2f519ec381}} 
+\index{codegen.h@{codegen.h}!generateHeaderFile@{generateHeaderFile}}
+\index{generateHeaderFile@{generateHeaderFile}!codegen.h@{codegen.h}}
+\doxysubsubsection{\texorpdfstring{generateHeaderFile()}{generateHeaderFile()}}
+{\footnotesize\ttfamily void generate\+Header\+File (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboundaryList}{TCD\+\_\+\+Boundary\+List}}}]{boundary\+List }\end{DoxyParamCaption})}
+
+
+
+Generates the header file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \mbox{\hyperlink{structboundaryList}{boundary\+List}}} & The boundary list\\
+\hline
+\end{DoxyParams}
+Generates the header file.
+
+
+\begin{DoxyParams}{Parameters}
+{\em \mbox{\hyperlink{structboundaryList}{boundary\+List}}} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{codegen_8h_af8b2c2561e74077407ec3c1d3c1d7d8a}\label{codegen_8h_af8b2c2561e74077407ec3c1d3c1d7d8a}} 
+\index{codegen.h@{codegen.h}!mergeGeneratedCode@{mergeGeneratedCode}}
+\index{mergeGeneratedCode@{mergeGeneratedCode}!codegen.h@{codegen.h}}
+\doxysubsubsection{\texorpdfstring{mergeGeneratedCode()}{mergeGeneratedCode()}}
+{\footnotesize\ttfamily void merge\+Generated\+Code (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Generates the source file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \mbox{\hyperlink{structboundaryList}{boundary\+List}}} & The boundary list\\
+\hline
+\end{DoxyParams}
+Generates the source file.
+
+Uses a shell script 

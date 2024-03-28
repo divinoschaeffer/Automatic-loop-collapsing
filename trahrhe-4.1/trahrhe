@@ -50,6 +50,8 @@ print_usage() {
     echo "  -d\"domain\": specifies the initial domain in iscc format and enclosed in double quotes (compulsory flag); computes the trahrhe expressions and related functions."
     echo "  example: $0 -d\"[NMAX] -> { [t1,t2,t3] : 0 <= t1 <= NMAX-1 and 0 <= t2 <= NMAX-1 and t1 <= t3 <= NMAX-1 and NMAX>=1}\""
     echo " "
+    echo "  -s\"suffix\": specifies a suffix for the function names generated in the header file (to be used with option -e)."
+    echo " "
     echo "  -t #tiling_levels: computes the trahrhe expressions and related functions required for algebraic tiling of #tiling_levels nested loops."
     echo "  example: $0 -d\"[NMAX] -> { [t1,t2,t3] : 0 <= t1 <= NMAX-1 and 0 <= t2 <= NMAX-1 and t1 <= t3 <= NMAX-1 and NMAX>=1}\" -t2"
     echo " "

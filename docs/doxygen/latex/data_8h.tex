@@ -1,0 +1,186 @@
+\hypertarget{data_8h}{}\doxysection{include/data.h File Reference}
+\label{data_8h}\index{include/data.h@{include/data.h}}
+
+
+Data structures and helper functions to structure the collapsing flow.  
+
+
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$ctype.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}flow.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}format\+\_\+helper.\+h\char`\"{}}\newline
+Include dependency graph for data.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structiterationDomain}{iteration\+Domain}}
+\begin{DoxyCompactList}\small\item\em Iteration domain representation. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structiterationDomainList}{iteration\+Domain\+List}}
+\item 
+struct \mbox{\hyperlink{structboundary}{boundary}}
+\begin{DoxyCompactList}\small\item\em Boundary list. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structboundaryList}{boundary\+List}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{data_8h_a32ed9202921919bd57d1ba5c8bb3db8c}\label{data_8h_a32ed9202921919bd57d1ba5c8bb3db8c}} 
+typedef struct \mbox{\hyperlink{structiterationDomain}{iteration\+Domain}} $\ast$ {\bfseries TCD\+\_\+\+Iteration\+Domain}
+\item 
+\mbox{\Hypertarget{data_8h_a5cc7d252857e065b92fbfd2c60f25eb6}\label{data_8h_a5cc7d252857e065b92fbfd2c60f25eb6}} 
+typedef struct \mbox{\hyperlink{structiterationDomainList}{iteration\+Domain\+List}} $\ast$ {\bfseries TCD\+\_\+\+Iteration\+Domain\+List}
+\item 
+\mbox{\Hypertarget{data_8h_a8a6d2030a3193fd0f6c0c1a9347daa04}\label{data_8h_a8a6d2030a3193fd0f6c0c1a9347daa04}} 
+typedef struct \mbox{\hyperlink{structboundary}{boundary}} $\ast$ {\bfseries TCD\+\_\+\+Boundary}
+\item 
+\mbox{\Hypertarget{data_8h_ace252801e83e8ca35bd79d12b5d8ff05}\label{data_8h_ace252801e83e8ca35bd79d12b5d8ff05}} 
+typedef struct \mbox{\hyperlink{structboundaryList}{boundary\+List}} $\ast$ {\bfseries TCD\+\_\+\+Boundary\+List}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structiterationDomain}{TCD\+\_\+\+Iteration\+Domain}} \mbox{\hyperlink{data_8h_a75f8254c241c0d97d2d5ec71e6e146c2}{copy\+Iteration\+Domain}} (\mbox{\hyperlink{structiterationDomain}{TCD\+\_\+\+Iteration\+Domain}} original)
+\begin{DoxyCompactList}\small\item\em Copy an iteration domain. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structboundary}{TCD\+\_\+\+Boundary}} \mbox{\hyperlink{data_8h_a67f497d38126fbe6d9eba3b47ed3d5cf}{get\+Boundary}} (osl\+\_\+statement\+\_\+p statement, osl\+\_\+names\+\_\+p iterator\+Strings)
+\begin{DoxyCompactList}\small\item\em Get a boundary given a domain. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structboundaryList}{TCD\+\_\+\+Boundary\+List}} \mbox{\hyperlink{data_8h_a41fab849d5f885bbc8e814958561385c}{get\+Boundaries}} ()
+\begin{DoxyCompactList}\small\item\em Get the Boundaries object from the current scop. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{data_8h_a4e21aabfe65e4fca28fc3a8741ba903b}{print\+Boundaries}} (\mbox{\hyperlink{structboundaryList}{TCD\+\_\+\+Boundary\+List}} \mbox{\hyperlink{structboundaryList}{boundary\+List}})
+\begin{DoxyCompactList}\small\item\em Print the boundaries. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structboundary}{TCD\+\_\+\+Boundary}} \mbox{\hyperlink{data_8h_af30c248faafe84eecf1e0b8f18e4bb1e}{copy\+Boundary}} (\mbox{\hyperlink{structboundary}{TCD\+\_\+\+Boundary}} original)
+\begin{DoxyCompactList}\small\item\em Copy a boundary. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Data structures and helper functions to structure the collapsing flow. 
+
+\begin{DoxyAuthor}{Author}
+Nongma SORGHO 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2024-\/02-\/04 
+\end{DoxyDate}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{data_8h_af30c248faafe84eecf1e0b8f18e4bb1e}\label{data_8h_af30c248faafe84eecf1e0b8f18e4bb1e}} 
+\index{data.h@{data.h}!copyBoundary@{copyBoundary}}
+\index{copyBoundary@{copyBoundary}!data.h@{data.h}}
+\doxysubsubsection{\texorpdfstring{copyBoundary()}{copyBoundary()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structboundary}{TCD\+\_\+\+Boundary}} copy\+Boundary (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboundary}{TCD\+\_\+\+Boundary}}}]{original }\end{DoxyParamCaption})}
+
+
+
+Copy a boundary. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em original} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+TCD\+\_\+\+Boundary
+\end{DoxyReturn}
+Copy a boundary.
+
+
+\begin{DoxyParams}{Parameters}
+{\em original} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+TCD\+\_\+\+Boundary 
+\end{DoxyReturn}
+\mbox{\Hypertarget{data_8h_a75f8254c241c0d97d2d5ec71e6e146c2}\label{data_8h_a75f8254c241c0d97d2d5ec71e6e146c2}} 
+\index{data.h@{data.h}!copyIterationDomain@{copyIterationDomain}}
+\index{copyIterationDomain@{copyIterationDomain}!data.h@{data.h}}
+\doxysubsubsection{\texorpdfstring{copyIterationDomain()}{copyIterationDomain()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structiterationDomain}{TCD\+\_\+\+Iteration\+Domain}} copy\+Iteration\+Domain (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structiterationDomain}{TCD\+\_\+\+Iteration\+Domain}}}]{original }\end{DoxyParamCaption})}
+
+
+
+Copy an iteration domain. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em original} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+TCD\+\_\+\+Iteration\+Domain 
+\end{DoxyReturn}
+\mbox{\Hypertarget{data_8h_a41fab849d5f885bbc8e814958561385c}\label{data_8h_a41fab849d5f885bbc8e814958561385c}} 
+\index{data.h@{data.h}!getBoundaries@{getBoundaries}}
+\index{getBoundaries@{getBoundaries}!data.h@{data.h}}
+\doxysubsubsection{\texorpdfstring{getBoundaries()}{getBoundaries()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structboundaryList}{TCD\+\_\+\+Boundary\+List}} get\+Boundaries (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Get the Boundaries object from the current scop. 
+
+\begin{DoxyReturn}{Returns}
+TCD\+\_\+\+Boundary\+List
+\end{DoxyReturn}
+Get the Boundaries object from the current scop.
+
+\begin{DoxyReturn}{Returns}
+TCD\+\_\+\+Boundary\+List 
+\end{DoxyReturn}
+\mbox{\Hypertarget{data_8h_a67f497d38126fbe6d9eba3b47ed3d5cf}\label{data_8h_a67f497d38126fbe6d9eba3b47ed3d5cf}} 
+\index{data.h@{data.h}!getBoundary@{getBoundary}}
+\index{getBoundary@{getBoundary}!data.h@{data.h}}
+\doxysubsubsection{\texorpdfstring{getBoundary()}{getBoundary()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structboundary}{TCD\+\_\+\+Boundary}} get\+Boundary (\begin{DoxyParamCaption}\item[{osl\+\_\+statement\+\_\+p}]{statement,  }\item[{osl\+\_\+names\+\_\+p}]{names }\end{DoxyParamCaption})}
+
+
+
+Get a boundary given a domain. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em statement} & \\
+\hline
+{\em iterator\+Strings} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+TCD\+\_\+\+Boundary
+\end{DoxyReturn}
+Get a boundary given a domain.
+
+
+\begin{DoxyParams}{Parameters}
+{\em statement} & \\
+\hline
+{\em names} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\mbox{\Hypertarget{data_8h_a4e21aabfe65e4fca28fc3a8741ba903b}\label{data_8h_a4e21aabfe65e4fca28fc3a8741ba903b}} 
+\index{data.h@{data.h}!printBoundaries@{printBoundaries}}
+\index{printBoundaries@{printBoundaries}!data.h@{data.h}}
+\doxysubsubsection{\texorpdfstring{printBoundaries()}{printBoundaries()}}
+{\footnotesize\ttfamily void print\+Boundaries (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structboundaryList}{TCD\+\_\+\+Boundary\+List}}}]{boundary\+List }\end{DoxyParamCaption})}
+
+
+
+Print the boundaries. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \mbox{\hyperlink{structboundaryList}{boundary\+List}}} & Print the boundaries.\\
+\hline
+{\em \mbox{\hyperlink{structboundaryList}{boundary\+List}}} & \\
+\hline
+\end{DoxyParams}
