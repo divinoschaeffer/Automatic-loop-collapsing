@@ -91,13 +91,16 @@ void write_init_section(TCD_Boundary boundary)
     fs_untabular();
 }
 
-/// @brief Recursive function to increment the loop variables
-/// @param curr_depth
-/// @param outer_var_bounds
-/// @param name_array
-/// @param stop_conditions
-/// @param stop_conditions_int
-/// @param options
+/**
+ * @brief Increments the loop variables
+ * @param curr_depth
+ * @param outer_var_bounds
+ * @param name_array
+ * @param stop_conditions
+ * @param stop_conditions_int
+ * @param options
+ * @return
+ */
 void increment(int curr_depth,
                char *outer_var_bounds,
                char **name_array,
@@ -145,7 +148,7 @@ void increment(int curr_depth,
     fs_tabular();
 
     fs_writef("%s++;", name_array[curr_depth]);
-    if (stop_conditions_int[curr_depth - 1] == 0)
+    if (stop_conditions_int[curr_depth - 1] == 1)
     {
         fs_writef("%s = %s - 1;", name_array[curr_depth + 1], name_array[curr_depth]);
     }
@@ -219,12 +222,12 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
             if (for_stmt->UB != NULL)
             {
                 stop_conditions[loop_nest_depth - 1] = for_stmt->UB;
-                stop_conditions_int[loop_nest_depth - 1] = 1;
+                stop_conditions_int[loop_nest_depth - 1] = 0;
             }
             else
             {
                 stop_conditions[loop_nest_depth - 1] = for_stmt->LB;
-                stop_conditions_int[loop_nest_depth - 1] = 0;
+                stop_conditions_int[loop_nest_depth - 1] = 1;
             }
             loop_nest_depth--;
         }
@@ -337,10 +340,12 @@ void generateCode(TCD_BoundaryList boundaryList)
     fs_close();
 }
 
-/// @brief Generates the header file for a given boundary
-/// @param boundary
-/// @param outputFile
-/// @param boundary_index
+/**
+ * @brief Generates the header file for a given boundary
+ * @param boundary
+ * @param outputFile
+ * @param boundary_index
+ */
 void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundary_index)
 {
     char *isl_domain = boundary->firstIterDomainOfUnion->first->iterationDomain;
