@@ -1,3 +1,7 @@
+/**
+ * @file main.c
+ */
+
 #include "main.h"
 
 extern TCD_FlowData *tcdFlowData;
