@@ -1,3 +1,14 @@
+/**
+ * @file data.c
+ * @author SORGHO Nongma
+ * @brief Data structures and helper functions to structure the collapsing flow
+ * @version 0.9
+ * @date 2024-04-04
+ *
+ * @copyright Copyright (c) 2024
+ *
+ */
+
 #include "data.h"
 #define MAX_VARIABLES 20
 
@@ -9,8 +20,9 @@ extern TCD_FlowData *tcdFlowData;
  * @param operation
  * @return char**
  */
-char **extractVariables(char *operation)
+char **extractVariables(const char *operation)
 {
+  char *operation_copy = strdup(operation);
   char **variables = (char **)malloc(MAX_VARIABLES * sizeof(char *));
   for (int i = 0; i < MAX_VARIABLES; i++)
   {
@@ -18,16 +30,21 @@ char **extractVariables(char *operation)
   }
 
   int i = 0;
-  char *token = strtok(operation, "+-*/");
+  char *token = strtok(operation_copy, "+-*/,");
   while (token != NULL)
   {
     strcpy(variables[i], token);
-    token = strtok(NULL, "+-*/");
+    token = strtok(NULL, "+-*/,");
     i++;
   }
   return variables;
 }
 
+/**
+ * @brief Copy an iteration domain
+ * @param original
+ * @return TCD_IterationDomain
+ */
 TCD_IterationDomain copyIterationDomain(TCD_IterationDomain original)
 {
   if (original == NULL)
@@ -49,11 +66,13 @@ TCD_IterationDomain copyIterationDomain(TCD_IterationDomain original)
   return copy;
 }
 
-/// @brief Returns the boundary of an OSL statement
-/// @param statement
-/// @param names
-/// @return
-TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
+/**
+ * @brief Returns the boundary of an OSL statement
+ * @param statement
+ * @param names
+ * @return
+ */
+TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names, int loop_nest_depth)
 {
   int i;
   int part, nb_parts;
@@ -68,8 +87,8 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
 
   TCD_Boundary boundary = (TCD_Boundary)malloc(sizeof(struct boundary));
 
-  boundary->firstIterDomainOfUnion = (TCD_IterationDomainList)malloc(sizeof(struct iterationDomainList));
-  boundary->firstIterDomainOfUnion->first = NULL;
+  boundary->firstIterationDomainOfUnion = (TCD_IterationDomainList)malloc(sizeof(struct iterationDomainList));
+  boundary->firstIterationDomainOfUnion->first = NULL;
 
   if (statement == NULL)
     return boundary;
@@ -114,7 +133,6 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
 
   string = osl_strings_sprint(names->parameters);
   size_t len = strcspn(string, "\n");
-  boundary->parametersCount = len;
 
   string[len] = '\0';
 
@@ -137,13 +155,13 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
   strcat(unuaryUnion, "] -> { [");
 
 #pragma region output_dims
-  for (int _i = 1; _i <= statement->domain->nb_output_dims; _i++)
+  for (int _i = 1; _i <= loop_nest_depth; _i++)
   {
     if (name_array == NULL)
       continue;
 
     strcat(unionList, name_array[_i]);
-    if (_i != statement->domain->nb_output_dims)
+    if (_i != loop_nest_depth)
       strcat(unionList, ",");
     if (_i == 1)
     {
@@ -159,8 +177,6 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
   strcat(unuaryUnion, unionList);
   strcat(unuaryUnion, "] : ");
 
-  boundary->iteratorDependenciesArray = (char ***)malloc(sizeof(char *));
-
   for (int depth = start_row; depth < statement->domain->nb_rows; depth++)
   {
     if (name_array == NULL)
@@ -169,13 +185,37 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
     char *relation_buffer = (char *)malloc(sizeof(char));
     sprintf(relation_buffer, "%s", osl_relation_expression(statement->domain, depth, name_array));
 
-    strcat(unuaryUnion, relation_buffer);
-    strcat(unuaryUnion, " >= 0");
-    if (depth != statement->domain->nb_rows - 1)
+    char **relation_buffer_variables = extractVariables(relation_buffer);
+
+    // if a variable of the relation buffer is not in the unionList,
+    // it is not in the iteration domain. So we skip it
+    char **unionList_variables = extractVariables(unionList);
+    int is_in_union = 0;
+    for (int i = 0; i < MAX_VARIABLES; i++)
+    {
+      if (strcmp(relation_buffer_variables[i], "") == 0)
+        break;
+      for (int j = 0; j < MAX_VARIABLES; j++)
+      {
+        if (strcmp(unionList_variables[j], "") == 0)
+          break;
+        if (strcmp(relation_buffer_variables[i], unionList_variables[j]) == 0)
+        {
+          is_in_union = 1;
+          break;
+        }
+      }
+      if (!is_in_union)
+        break;
+    }
+    if (!is_in_union)
+      continue;
+    if (depth != statement->domain->nb_rows - 1 && depth != start_row)
       strcat(unuaryUnion, " and ");
 
-    boundary->iteratorDependenciesArray[depth] = (char **)calloc(statement->domain->nb_rows, sizeof(char *));
-    boundary->iteratorDependenciesArray[depth] = extractVariables(relation_buffer);
+    strcat(unuaryUnion, relation_buffer);
+    strcat(unuaryUnion, " >= 0");
+
 #pragma endregion
   }
 
@@ -189,13 +229,13 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
 
   boundary->nameArray = name_array;
 
-  if (boundary->firstIterDomainOfUnion->first == NULL)
+  if (boundary->firstIterationDomainOfUnion->first == NULL)
   {
-    boundary->firstIterDomainOfUnion->first = iterationDomainsUnion;
+    boundary->firstIterationDomainOfUnion->first = iterationDomainsUnion;
   }
   else
   {
-    TCD_IterationDomain current = boundary->firstIterDomainOfUnion->first;
+    TCD_IterationDomain current = boundary->firstIterationDomainOfUnion->first;
     while (current->next != NULL)
     {
       current = current->next;
@@ -208,7 +248,7 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names)
 }
 
 /**
- * @brief Get the Boundaries object
+ * @brief Get the Boundaries object list
  * @return TCD_BoundaryList
  */
 TCD_BoundaryList getBoundaries()
@@ -236,6 +276,7 @@ TCD_BoundaryList getBoundaries()
   }
 
   osl_statement_p statement;
+  int boundary_index = 0;
 
   while (scop != NULL)
   {
@@ -266,7 +307,7 @@ TCD_BoundaryList getBoundaries()
     }
 
     statement = scop->statement;
-    TCD_Boundary currentBoundary = getBoundary(statement, names);
+    TCD_Boundary currentBoundary = getBoundary(statement, names, tcdFlowData->collapseParameters[boundary_index]);
 
     if (boundaryHead->first == NULL)
     {
@@ -297,6 +338,7 @@ TCD_BoundaryList getBoundaries()
       names->arrays = arrays_backup;
     }
     scop = scop->next;
+    boundary_index++;
   }
 
   osl_names_free(names);
@@ -318,8 +360,8 @@ TCD_Boundary copyBoundary(TCD_Boundary original)
   if (copy == NULL)
     return NULL;
 
-  copy->firstIterDomainOfUnion = (TCD_IterationDomainList)malloc(sizeof(struct iterationDomainList));
-  copy->firstIterDomainOfUnion->first = copyIterationDomain(original->firstIterDomainOfUnion->first);
+  copy->firstIterationDomainOfUnion = (TCD_IterationDomainList)malloc(sizeof(struct iterationDomainList));
+  copy->firstIterationDomainOfUnion->first = copyIterationDomain(original->firstIterationDomainOfUnion->first);
 
   copy->next = copyBoundary(original->next);
 
@@ -336,7 +378,7 @@ void printBoundaries(TCD_BoundaryList boundaryList)
   while (boundary != NULL)
   {
     printf("Boundary: -----\n");
-    TCD_IterationDomain unions = boundary->firstIterDomainOfUnion->first;
+    TCD_IterationDomain unions = boundary->firstIterationDomainOfUnion->first;
     int i = 0;
     printf("%s\n", unions->iterationDomain);
     boundary = boundary->next;

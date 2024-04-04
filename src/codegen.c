@@ -2,8 +2,12 @@
  * @file codegen.c
  * @author SORGHO Nongma
  * @brief Edits an OpenSCoP representation to generate an output code where loops are collapsed.
- * @version 0.1
+ * @version 0.9
  * @date 2024-02-09
+ * @details The code generation is done in three steps:
+ * 1. Generate the code for each boundary
+ * 2. Generate the header file for each boundary
+ * 3. Merge the generated code with the original code
  * @copyright Copyright (c) 2024
  */
 
@@ -53,7 +57,6 @@ void write_init_section(TCD_Boundary boundary)
         char *vars = (char *)malloc(1024 * sizeof(char));
         char *tmp = (char *)malloc(1024 * sizeof(char));
 
-        strcpy(tmp, outer_var_bounds);
         sprintf(vars, "pc_%d", boundary_index);
 
         // add iteration variables from start to curr_depth
@@ -63,23 +66,12 @@ void write_init_section(TCD_Boundary boundary)
             strcat(vars, name_array[i + 1]);
         }
 
-        // take only first curr_depth parameters
-        char *token = strtok(tmp, ",");
-        int token_count = 0;
-        do
+        if (outer_var_bounds != NULL && outer_var_bounds[0] != '\0')
         {
-            if (token_count <= max_depth)
-            {
-                strcat(vars, ",");
-                strcat(vars, token);
-            }
-            else
-            {
-                break;
-            }
-            token_count++;
-            token = strtok(NULL, ",");
-        } while (token != NULL);
+            strcat(vars, ",");
+            strcat(vars, outer_var_bounds);
+        }
+
         fs_writef("%s = trahrhe_%s%d(%s);", name_array[curr_depth + 1], name_array[curr_depth + 1], boundary_index, vars);
 
         curr_depth++;
@@ -163,12 +155,14 @@ void increment(int curr_depth,
     fs_writef("}");
 }
 
-/// @brief Writes the increment section of the generated code
-/// @details The increment section is the part of the code that increments the loop variables
-/// @param boundary
-/// @param stop_conditions
-/// @param stop_conditions_int
-/// @param options
+/**
+ * @brief Writes the increment section of the generated code
+ * @details The increment section is the part of the code that increments the loop variables
+ * @param boundary
+ * @param stop_conditions
+ * @param stop_conditions_int
+ * @param options
+ */
 void write_increment_section(TCD_Boundary boundary, struct clast_expr *stop_conditions[], int *stop_conditions_int, CloogOptions *options)
 {
     char *outer_var = boundary->outerLoopVar;
@@ -348,7 +342,7 @@ void generateCode(TCD_BoundaryList boundaryList)
  */
 void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundary_index)
 {
-    char *isl_domain = boundary->firstIterDomainOfUnion->first->iterationDomain;
+    char *isl_domain = boundary->firstIterationDomainOfUnion->first->iterationDomain;
 
     printf("isl_domain: %s\n", isl_domain);
 

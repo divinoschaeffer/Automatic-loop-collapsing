@@ -91,30 +91,29 @@ static void kernel_correlation(int m, int n,
         stddev[j] = stddev[j] <= eps ? SCALAR_VAL(1.0) : stddev[j];
     }
 
-
-unsigned pc_0;
-unsigned upper_bound_0 = Ehrhart0(_PB_N,_PB_M);
-unsigned first_iteration_0 = 1;
-#pragma omp parallel for private(i,j) firstprivate(first_iteration_0) schedule(static)
-for (pc_0 = 1; pc_0 <= upper_bound_0; pc_0++)
-{
-	if (first_iteration_0)
+	unsigned pc_0;
+	unsigned upper_bound_0 = Ehrhart0(_PB_N,_PB_M);
+	unsigned first_iteration_0 = 1;
+	#pragma omp parallel for private(i,j) firstprivate(first_iteration_0) schedule(static)
+	for (pc_0 = 1; pc_0 <= upper_bound_0; pc_0++)
 	{
-		i = trahrhe_i0(pc_0,_PB_N,_PB_M);
-		j = trahrhe_j0(pc_0,i,_PB_N,_PB_M);
-		first_iteration_0 = 0;
-	}
-	
-	data[i][j] -= mean[j];
+		if (first_iteration_0)
+		{
+			i = trahrhe_i0(pc_0,_PB_N,_PB_M);
+			j = trahrhe_j0(pc_0,i,_PB_N,_PB_M);
+			first_iteration_0 = 0;
+		}
+		
+		data[i][j] -= mean[j];
 	data[i][j] /= SQRT_FUN(float_n) * stddev[j];
 
-	j++;
-	if (j < _PB_M-1)
-	{
-		i++;
-		j = i + 1;
+		j++;
+		if (j > _PB_M-1)
+		{
+			i++;
+			j = i + 1;
+		}
 	}
-}
 
 
     /* Calculate the m * m correlation matrix. */
