@@ -13,8 +13,8 @@ HEADER_FILES = $(wildcard include/*.h)
 
 all: $(TARGET)
 
-$(TARGET): main.c main.h $(SRC_FILES) $(HEADER_FILES)
-	$(CC) main.c main.h $(SRC_FILES) $(HEADER_FILES) $(CFLAGS) -o $(OUTPUT_DIR)/$(TARGET) 
+$(TARGET): $(SRC_FILES) $(HEADER_FILES)
+	$(CC) $(SRC_FILES) $(HEADER_FILES) $(CFLAGS) -o $(OUTPUT_DIR)/$(TARGET) 
 
 clean:
 	$(RM) $(TARGET)

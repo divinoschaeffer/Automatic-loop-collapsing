@@ -381,7 +381,7 @@ void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundar
 
     remove("trahrhe-4.1/trahrhe_header.h");
 
-    free(bash_command);
+    // free(bash_command);
 }
 
 /// @brief Generates the header file for all the boundaries of a given input
@@ -431,8 +431,8 @@ void mergeGeneratedCode()
 
     system(command);
 
-    free(command);
-    free(pwd);
+    // free(command);
+    // free(pwd);
 }
 
 /// @brief Removes the temporary files
@@ -441,5 +441,5 @@ void removeTemporaryFiles()
     char *command = (char *)malloc(1024 * sizeof(char));
     sprintf(command, "rm %s.c %s %s %s", INTERMEDIATE_FILENAME, SCOPED_FILENAME, COLLAPSE_PARAMETERS_FILENAME, "tmp.c");
     system(command);
-    free(command);
+    // free(command);
 }
