@@ -13,6 +13,10 @@ HEADER_FILES = $(wildcard include/*.h)
 
 all: $(TARGET)
 
+install:
+	@echo "Installing $(TARGET) to /usr/local/bin"
+	@cp $(OUTPUT_DIR)/$(TARGET) /usr/local/bin
+
 $(TARGET): $(SRC_FILES) $(HEADER_FILES)
 	$(CC) $(SRC_FILES) $(HEADER_FILES) $(CFLAGS) -o $(OUTPUT_DIR)/$(TARGET) 
 
