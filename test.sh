@@ -29,9 +29,9 @@ for sub_directory in "$parent_directory"/*; do
         exit2=$("$executable2_absolute")
         
         if [ "$exit1" = "$exit2" ]; then
-            echo "Les sorties des exécutables sont identiques."
+            echo -e "\e[32mTest réussi\e[0m"
         else
-            echo "Les sorties des exécutables sont différentes."
+            echo -e "\e[32mEchec du test\e[0m"
         fi
         
         echo
