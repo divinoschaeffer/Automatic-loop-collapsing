@@ -10,6 +10,10 @@
 #ifndef __CODEGEN_H
 #define __CODEGEN_H
 
+#ifndef TRAHRHE_INSTALL_DIR
+#define TRAHRHE_INSTALL_DIR "./trahrhe"
+#endif
+
 #include <osl/osl.h>
 #include <cloog/isl/cloog.h>
 

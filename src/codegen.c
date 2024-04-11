@@ -347,8 +347,7 @@ void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundar
     printf("isl_domain: %s\n", isl_domain);
 
     char *bash_command = (char *)malloc(1024 * sizeof(char));
-    sprintf(bash_command, "cd trahrhe-4.1 && ./trahrhe -d\"%s\" -s\"%d\" -e", isl_domain, boundary_index);
-    // output file is trahrhe-4.1/trahrhe_header.h
+    sprintf(bash_command, "cd %s && ./trahrhe -d\"%s\" -s\"%d\" -e", TRAHRHE_INSTALL_DIR, isl_domain, boundary_index);
     FILE *tmp = fopen("tmp.sh", "w+");
     if (tmp == NULL)
     {
@@ -360,10 +359,13 @@ void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundar
     system("chmod +x tmp.sh && ./tmp.sh");
     remove("tmp.sh");
 
-    FILE *headerFile = fopen("trahrhe-4.1/trahrhe_header.h", "r");
+    char *headerFilename = (char *)malloc(1024 * sizeof(char));
+    sprintf(headerFilename, "%s/trahrhe_header.h", TRAHRHE_INSTALL_DIR);
+
+    FILE *headerFile = fopen(headerFilename, "r");
     if (headerFile == NULL)
     {
-        fprintf(stderr, "Error: Unable to open file trahrhe-4.1/trahrhe_header.h\n");
+        fprintf(stderr, "Error: Unable to open file %s\n", headerFilename);
         exit(EXIT_FAILURE);
     }
 
@@ -379,7 +381,7 @@ void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundar
 
     fprintf(outputFile, "%s", string);
 
-    remove("trahrhe-4.1/trahrhe_header.h");
+    remove(headerFilename);
 
     // free(bash_command);
 }
