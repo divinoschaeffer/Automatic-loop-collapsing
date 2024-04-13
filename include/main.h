@@ -8,11 +8,6 @@
 #include "flow.h"
 #include "data.h"
 #include "codegen.h"
-
-#ifndef TRAHRHE_INSTALL_DIR
-#define TRAHRHE_INSTALL_DIR "./trahrhe"
-#endif
-
 /**
  * @brief Exposed main function to collapse loops using Trhahre
  * @details This function reads the input file, parses it, and collapses the loops

@@ -7,6 +7,7 @@ This section provides a guide on how to use the Automatic Loop Collapsing tool.
 Before using the Automatic Loop Collapsing tool, ensure that you have the following prerequisites:
 
 - Installed all the dependencies as described in the [installation guide](./INSTALL.md).
+- Installed the Automatic Loop Collapsing tool as described in the [installation guide](./INSTALL.md).
 - Familiarized yourself with the [feature definitions](./FEATURE_DEFINITIONS.md).
 - Ensure that your input file is in the correct format i.e., it should contain the loops that you want to collapse along with the `#pragma trahrhe collapse(N)` directive.
 
@@ -14,18 +15,10 @@ Before using the Automatic Loop Collapsing tool, ensure that you have the follow
 
 To use the Automatic Loop Collapsing tool, follow these steps:
 
-1. Clone the repository:
+1. Run the following command:
 
    ```bash
-   git clone
-    ```
-
-2. Navigate to the `Automatic-loop-collapsing` directory:
-   
-3. Run the following command:
-
-   ```bash
-   (collapse) [input.c] -o [output.c]
+   trahrhe-collapse [input.c] -o [output.c]
    ```
 
    You can also specify additional options that are:
@@ -33,7 +26,7 @@ To use the Automatic Loop Collapsing tool, follow these steps:
    - `-v` or `--version`: Display the version of the tool.
    - `-o` or `--output`: Specify the output file.
 
-4. The tool will automatically collapse the loops in the input file and generate the output file.
+2. The tool will automatically collapse the loops in the input file and generate the output file.
 
 ## Example
 

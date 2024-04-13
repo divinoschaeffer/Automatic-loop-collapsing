@@ -1,5 +1,4 @@
 /**
- * @file codegen.c
  * @author SORGHO Nongma
  * @brief Edits an OpenSCoP representation to generate an output code where loops are collapsed.
  * @version 0.9
@@ -13,6 +12,11 @@
 
 #include "codegen.h"
 
+#ifndef TRAHRHE_INSTALL_DIR
+#warning "TRAHRHE_INSTALL_DIR not defined. Using default value path: ./trahrhe"
+#define TRAHRHE_INSTALL_DIR "./trahrhe"
+#endif
+
 FILE *fs;
 extern TCD_FlowData *tcdFlowData;
 
@@ -24,7 +28,6 @@ unsigned boundary_index = 0;
  */
 void write_init_section(TCD_Boundary boundary)
 {
-    char *outer_var = boundary->outerLoopVar;
     char *outer_var_bounds = boundary->outerLoopUpperBound;
     char *iteration_domains = boundary->iterationDomainsString;
     char **name_array = boundary->nameArray;
@@ -55,7 +58,6 @@ void write_init_section(TCD_Boundary boundary)
     {
         // Construct variables on which the iteration variable depends
         char *vars = (char *)malloc(1024 * sizeof(char));
-        char *tmp = (char *)malloc(1024 * sizeof(char));
 
         sprintf(vars, "pc_%d", boundary_index);
 
@@ -165,9 +167,7 @@ void increment(int curr_depth,
  */
 void write_increment_section(TCD_Boundary boundary, struct clast_expr *stop_conditions[], int *stop_conditions_int, CloogOptions *options)
 {
-    char *outer_var = boundary->outerLoopVar;
     char *outer_var_bounds = boundary->outerLoopUpperBound;
-    char *iteration_domains = boundary->iterationDomainsString;
     char **name_array = boundary->nameArray;
 
     int max_depth = tcdFlowData->collapseParameters[boundary_index];
@@ -282,7 +282,6 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
 void generateCode(TCD_BoundaryList boundaryList)
 {
     osl_scop_p scop = tcdFlowData->scop;
-    osl_statement_p statement;
 
     CloogState *state;
     CloogInput *input;
@@ -347,7 +346,20 @@ void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundar
     printf("isl_domain: %s\n", isl_domain);
 
     char *bash_command = (char *)malloc(1024 * sizeof(char));
-    sprintf(bash_command, "cd %s && ./trahrhe -d\"%s\" -s\"%d\" -e", TRAHRHE_INSTALL_DIR, isl_domain, boundary_index);
+    char *trahrhe_install_directory = (char *)malloc(1024 * sizeof(char));
+    strcat(trahrhe_install_directory, TRAHRHE_INSTALL_DIR);
+
+    /*
+        if (getenv("TRAHRHE_INSTALL_DIR") == NULL || getenv("TRAHRHE_INSTALL_DIR")[0] == '\0')
+        {
+            sprintf(trahrhe_install_directory, "./trahrhe");
+        }
+        else
+        {
+            sprintf(trahrhe_install_directory, "%s", getenv("TRAHRHE_INSTALL_DIR"));
+        }
+    */
+    sprintf(bash_command, "cd %s/trahrhe -d\"%s\" -s\"%d\" -e", trahrhe_install_directory, isl_domain, boundary_index);
     FILE *tmp = fopen("tmp.sh", "w+");
     if (tmp == NULL)
     {
@@ -360,7 +372,7 @@ void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundar
     remove("tmp.sh");
 
     char *headerFilename = (char *)malloc(1024 * sizeof(char));
-    sprintf(headerFilename, "%s/trahrhe_header.h", TRAHRHE_INSTALL_DIR);
+    sprintf(headerFilename, "%s/trahrhe_header.h", trahrhe_install_directory);
 
     FILE *headerFile = fopen(headerFilename, "r");
     if (headerFile == NULL)
@@ -382,6 +394,8 @@ void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundar
     fprintf(outputFile, "%s", string);
 
     remove(headerFilename);
+
+    free(trahrhe_install_directory);
 
     // free(bash_command);
 }

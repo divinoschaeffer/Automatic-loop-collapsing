@@ -1,9 +1,6 @@
 CC = gcc
-ROOTDIR = $(shell pwd)
-TRAHRHE_INSTALL_DIR_VALUE = $(TRAHRHE_INSTALL_DIR)
 
-# CFLAGS  = -g -Wall -I$(ROOTDIR)/clan/include -L$(ROOTDIR)/clan -I$(ROOTDIR)/clan/osl/include -L$(ROOTDIR)/clan/osl
-CFLAGS  = -losl -lclan -lisl -Iinclude -Lcloog -Icloog/include -lcloog-isl -g -DTRAHRHE_INSTALL_DIR=TRAHRHE_INSTALL_DIR_VALUE
+CFLAGS  = -losl -lclan -lisl -Iinclude -lcloog-isl -DTRAHRHE_INSTALL_DIR="$(TRAHRHE_INSTALL_DIR)"
 OUTPUT_DIR = .
 
 TARGET = trahrhe-collapse
@@ -17,13 +14,17 @@ all: $(TARGET)
 install:
 	@echo "Installing $(TARGET) to /usr/local/bin"
 	@cp $(OUTPUT_DIR)/$(TARGET) /usr/local/bin
+	@echo "$(TARGET) has successfully been installed to /usr/local/bin"
 
 uninstall:
 	@echo "Uninstalling $(TARGET) from /usr/local/bin"
 	@rm -f /usr/local/bin/$(TARGET)
+	@echo "$(TARGET) has successfully been uninstalled from /usr/local/bin"
 
 $(TARGET): $(SRC_FILES) $(HEADER_FILES)
-	$(CC) $(SRC_FILES) $(HEADER_FILES) $(CFLAGS) -o $(OUTPUT_DIR)/$(TARGET) 
+	$(CC) $(SRC_FILES) -Iinclude $(CFLAGS) -o $(OUTPUT_DIR)/$(TARGET)
+
+$(SRC_FILES): $(HEADER_FILES)
 
 clean:
 	$(RM) $(TARGET)

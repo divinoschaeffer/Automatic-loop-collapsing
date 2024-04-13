@@ -4,13 +4,10 @@
  * @brief Data structures and helper functions to structure the collapsing flow
  * @version 0.9
  * @date 2024-04-04
- *
- * @copyright Copyright (c) 2024
- *
  */
 
 #include "data.h"
-#define MAX_VARIABLES 20
+#define MAX_VARIABLES 100
 
 extern TCD_FlowData *tcdFlowData;
 
@@ -75,14 +72,10 @@ TCD_IterationDomain copyIterationDomain(TCD_IterationDomain original)
 TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names, int loop_nest_depth)
 {
   int i;
-  int part, nb_parts;
+  int nb_parts;
   int is_access_array;
   int start_row;
-  int index_output_dims;
-  int index_input_dims;
-  int index_params;
 
-  TCD_IterationDomain iterationDomainsFirst = NULL;
   char **name_array = NULL;
 
   TCD_Boundary boundary = (TCD_Boundary)malloc(sizeof(struct boundary));
@@ -104,10 +97,6 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names, int loop_
     exit(EXIT_FAILURE);
   }
 #pragma region osl stuff init
-  index_output_dims = 1;
-  index_input_dims = index_output_dims + statement->domain->nb_output_dims;
-  index_params = index_input_dims + statement->domain->nb_input_dims;
-
   // Prepare the array of strings for comments.
   name_array = osl_relation_strings(statement->domain, names);
 
@@ -264,10 +253,7 @@ TCD_BoundaryList getBoundaries()
   osl_strings_p arrays_backup = NULL;
   osl_names_p names;
   osl_arrays_p arrays;
-  int iterators_backedup = 0;
-  int nb_ext = 0;
   osl_body_p body = NULL;
-  osl_strings_p iterators_backup = NULL;
 
   if (scop == NULL)
   {
@@ -301,8 +287,6 @@ TCD_BoundaryList getBoundaries()
     body = (osl_body_p)osl_generic_lookup(scop->statement->extension, OSL_URI_BODY);
     if (body && body->iterators != NULL)
     {
-      iterators_backedup = 1;
-      iterators_backup = names->iterators;
       names->iterators = body->iterators;
     }
 
@@ -379,7 +363,6 @@ void printBoundaries(TCD_BoundaryList boundaryList)
   {
     printf("Boundary: -----\n");
     TCD_IterationDomain unions = boundary->firstIterationDomainOfUnion->first;
-    int i = 0;
     printf("%s\n", unions->iterationDomain);
     boundary = boundary->next;
   }
