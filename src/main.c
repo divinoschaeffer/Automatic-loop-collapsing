@@ -92,7 +92,7 @@ void cliMiddleware(int argc, char **argv)
             exit(EXIT_SUCCESS);
         }
     }
-    if (2 < argc && argc < 3)
+    if (argc < 2 || argc > 4)
     {
         fprintf(stderr, "%s", usageMessage);
         exit(EXIT_FAILURE);
