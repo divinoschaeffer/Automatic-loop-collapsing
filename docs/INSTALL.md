@@ -1,6 +1,31 @@
 # Installation Guide
 
-## Dependencies
+This document provides instructions on how to install the trahrhe-collapse library.
+
+## Installation
+
+To install the library, you need to follow these steps:
+- Clone the repository
+- Ensure you have the necessary [prerequisites](#prerequisites)
+- Run the install script with
+```bash
+sudo bash install.sh
+```
+
+Then, specify the path to Trahrhe's root directory. This is the directory where the `trahrhe` binary is located. The default path is `/usr/local/bin`. If you have installed Trahrhe in a different directory, you can specify the path by running the following command:
+    
+```bash
+export TRAHRHE_INSTALL_DIR=<path_to_trahrhe>
+```
+
+## Uninstalling
+
+Run 
+```bash
+sudo bash uninstall.sh
+```
+
+## Prerequisites
 
 - [GMP](https://gmplib.org/)
 - [NTL](http://www.shoup.net/ntl/)

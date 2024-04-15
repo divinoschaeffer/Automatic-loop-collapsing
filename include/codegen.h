@@ -4,7 +4,6 @@
  * @brief This file contains the code generation functions
  * @version 0.1
  * @date 2024-02-09
- * @copyright Copyright (c) 2024
  */
 
 #ifndef __CODEGEN_H
@@ -12,6 +11,7 @@
 
 #include <osl/osl.h>
 #include <cloog/isl/cloog.h>
+#include <stdlib.h>
 
 #include "flow.h"
 #include "data.h"

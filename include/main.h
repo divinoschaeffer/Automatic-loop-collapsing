@@ -2,13 +2,10 @@
 #define __MAIN_H
 
 #include <stdio.h>
-#include <osl/osl.h>
-#include <clan/clan.h>
 
 #include "flow.h"
 #include "data.h"
 #include "codegen.h"
-
 /**
  * @brief Exposed main function to collapse loops using Trhahre
  * @details This function reads the input file, parses it, and collapses the loops
