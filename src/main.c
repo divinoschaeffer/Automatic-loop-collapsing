@@ -16,21 +16,16 @@ extern TCD_FlowData *tcdFlowData;
  */
 int collapse(char *inputFilename, char *outputFilename)
 {
+#pragma region Step0
+
     initTcdFlow(inputFilename, outputFilename);
+
+#pragma endregion
 
 #pragma region Step1
 
     /* Step 1: Extract loops polytope representation */
-    osl_scop_p scop;
-    clan_options_p options;
-    /* Default option setting. */
-    options = clan_options_malloc();
-    /* Extraction of the SCoP. */
-    FILE *entryFile = fopen(tcdFlowData->entryFile, "r");
-    scop = clan_scop_extract(entryFile, options);
-    printf("Language: %s\n", scop->language);
-
-    tcdFlowData->scop = scop;
+    extractLoopsPolytope();
 
 #pragma endregion
 
@@ -63,11 +58,16 @@ int collapse(char *inputFilename, char *outputFilename)
 
     /* Save the planet. */
     removeTemporaryFiles();
-    clan_options_free(options);
-    osl_scop_free(scop);
+    endTcdFlow();
 
     exit(EXIT_SUCCESS);
 }
+
+const char *usageMessage = "Usage: trahrhe-collapse <inputFilename> [-o <outputFilename>]\n"
+                           "Options :\n"
+                           "    -o, --output <outputFilename> Specify the output filename\n"
+                           "    -h, --help Display this help message\n"
+                           "    -v, --version Display the version of the program\n";
 
 /**
  * @brief Middleware for the command line interface
@@ -77,9 +77,24 @@ int collapse(char *inputFilename, char *outputFilename)
  */
 void cliMiddleware(int argc, char **argv)
 {
+    if (argc == 2)
+    {
+        if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0)
+        {
+            fprintf(stdout, "%s", usageMessage);
+
+            exit(EXIT_SUCCESS);
+        }
+        if (strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0)
+        {
+            fprintf(stdout, "Trahrhe Collapse - v0.1\n");
+
+            exit(EXIT_SUCCESS);
+        }
+    }
     if (2 < argc && argc < 3)
     {
-        fprintf(stderr, "Usage: <collapse> <inputFilename> [-o <outputFilename>]\n");
+        fprintf(stderr, "%s", usageMessage);
         exit(EXIT_FAILURE);
     }
 }

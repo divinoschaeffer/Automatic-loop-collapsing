@@ -9,10 +9,14 @@ To install the library, you need to follow these steps:
 - Ensure you have the necessary [prerequisites](#prerequisites)
 - Run the install script with
 ```bash
-sudo bash install.sh "[trahrhe_installation_directory]"
+sudo bash install.sh
 ```
 
-The `install.sh` script will install the library with the specified trahrhe installation directory. If you do not specify a directory, the script will install the library in the default directory `./trahrhe` and then you will need to install trahrhe in the same directory.
+Then, specify the path to Trahrhe's root directory. This is the directory where the `trahrhe` binary is located. The default path is `/usr/local/bin`. If you have installed Trahrhe in a different directory, you can specify the path by running the following command:
+    
+```bash
+export TRAHRHE_INSTALL_DIR=<path_to_trahrhe>
+```
 
 ## Uninstalling
 

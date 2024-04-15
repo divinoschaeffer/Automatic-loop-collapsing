@@ -1,6 +1,6 @@
 CC = gcc
 
-CFLAGS  = -losl -lclan -lisl -Iinclude -lcloog-isl -DTRAHRHE_INSTALL_DIR="$(TRAHRHE_INSTALL_DIR)"
+CFLAGS  = -losl -lclan -lisl -Iinclude -lcloog-isl
 OUTPUT_DIR = .
 
 TARGET = trahrhe-collapse

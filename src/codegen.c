@@ -12,11 +12,6 @@
 
 #include "codegen.h"
 
-#ifndef TRAHRHE_INSTALL_DIR
-#warning "TRAHRHE_INSTALL_DIR not defined. Using default value path: ./trahrhe"
-#define TRAHRHE_INSTALL_DIR "./trahrhe"
-#endif
-
 FILE *fs;
 extern TCD_FlowData *tcdFlowData;
 
@@ -347,18 +342,22 @@ void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundar
 
     char *bash_command = (char *)malloc(1024 * sizeof(char));
     char *trahrhe_install_directory = (char *)malloc(1024 * sizeof(char));
-    strcat(trahrhe_install_directory, TRAHRHE_INSTALL_DIR);
+    if (getenv("TRAHRHE_INSTALL_DIR") == NULL)
+    {
+        const char *trahrhe_warning_message = "Warning: TRAHRHE_INSTALL_DIR not defined.\n"
+                                              "Using default value path: ./trahrhe assuming trahrhe is\n"
+                                              "in the same directory as the compiler.\n"
+                                              "To set the path, please define the environment variable TRAHRHE_INSTALL_DIR\n"
+                                              "with the path to the trahrhe directory.\n"
+                                              "Example: export TRAHRHE_INSTALL_DIR=/path/to/trahrhe\n";
+        fprintf(stderr, trahrhe_warning_message);
+        strcpy(trahrhe_install_directory, "./trahrhe");
+    }
+    else
+    {
+        strcpy(trahrhe_install_directory, getenv("TRAHRHE_INSTALL_DIR"));
+    }
 
-    /*
-        if (getenv("TRAHRHE_INSTALL_DIR") == NULL || getenv("TRAHRHE_INSTALL_DIR")[0] == '\0')
-        {
-            sprintf(trahrhe_install_directory, "./trahrhe");
-        }
-        else
-        {
-            sprintf(trahrhe_install_directory, "%s", getenv("TRAHRHE_INSTALL_DIR"));
-        }
-    */
     sprintf(bash_command, "cd %s/trahrhe -d\"%s\" -s\"%d\" -e", trahrhe_install_directory, isl_domain, boundary_index);
     FILE *tmp = fopen("tmp.sh", "w+");
     if (tmp == NULL)
