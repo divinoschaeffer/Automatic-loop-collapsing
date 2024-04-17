@@ -1,9 +1,9 @@
 <!-- Title -->
 <div align="center">
 
-# Automatic-loop-collapsing
+# Trahrhe Collapse - Automatic Collapsing of Non Rectangular Loops
 
-A tool to collapse loops in C code automatically using Ehrhart polynomials and the polyhedral model.
+A tool to collapse loops in C, C++, C# and Java code automatically using Ehrhart polynomials and the polyhedral model.
 
 </div>
 
