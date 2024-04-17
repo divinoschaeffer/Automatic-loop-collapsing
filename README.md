@@ -8,7 +8,7 @@ A tool to collapse loops in C code automatically using Ehrhart polynomials and t
 </div>
 
 ## Installation
-<iframe src="docs/INSTALL.md" width="100%" height="300px"></iframe>
+!include ./docs/INSTALL.md
 
 ## Feature Definitions
 Refer to the [feature definitions](./docs/FEATURE_DEFINITIONS.md).
