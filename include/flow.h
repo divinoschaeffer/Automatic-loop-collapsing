@@ -9,11 +9,13 @@
 #ifndef __FLOW_H
 #define __FLOW_H
 
+#include <osl/osl.h>
+#include <clan/clan.h>
+#include <osl/osl.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <osl/osl.h>
 
 #define SCOPED_FILENAME "scope.source.scop"
 #define COLLAPSE_PARAMETERS_FILENAME "collapse_parameter.source.txt"
@@ -49,6 +51,11 @@ typedef struct
  * @brief Inits the Tcd_Flow structure
  */
 void initTcdFlow(char *inputFilename, char *outputFilename);
+
+/**
+ * @brief Extract loops polytope representation
+ */
+void extractLoopsPolytope(void);
 
 /**
  * @brief Destruct the Tcd_Flow and frees all memories spaces linked to it.

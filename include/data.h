@@ -15,7 +15,6 @@
 #include <ctype.h>
 
 #include "flow.h"
-#include "hashtable.h"
 #include "format_helper.h"
 
 /**
@@ -53,7 +52,7 @@ struct boundary
   /**
    * @brief The iteration domain unions to pass to Trhahre
    */
-  TCD_IterationDomainList firstIterDomainOfUnion;
+  TCD_IterationDomainList firstIterationDomainOfUnion;
   /**
    * @brief Outer loop variable
    */
@@ -67,27 +66,13 @@ struct boundary
    */
   char *iterationDomainsString;
   /**
-   * @brief An array of string representing the list of dependencies
-   * of the iterators in the same order as the iterators in the domain
-   */
-  char ***iteratorDependenciesArray;
-  /**
    * @brief The array of the iterator names
    */
   char **nameArray;
   /**
-   * @deprecated
-   * @brief Dependencies hashtable
-   */
-  struct nlist *hashTable;
-  /**
    * @brief Next loop boundaries
    */
   struct boundary *next;
-  /**
-   * @brief The number of parameters
-   */
-  int parametersCount;
 };
 typedef struct boundary *TCD_Boundary;
 
@@ -101,9 +86,10 @@ typedef struct boundaryList *TCD_BoundaryList;
  * @brief Get a boundary given a domain
  * @param statement
  * @param iteratorStrings
+ * @param loop_nest_depth
  * @return TCD_Boundary
  */
-TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p iteratorStrings);
+TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p iteratorStrings, int loop_nest_depth);
 
 /**
  * @brief Get the Boundaries object from the current scop
@@ -124,6 +110,14 @@ void printBoundaries(TCD_BoundaryList boundaryList);
  */
 TCD_Boundary copyBoundary(TCD_Boundary original);
 
+/**
+ * @brief Get variables real "strings" from the scop
+ * @details those strings are computed by the osl library and
+ * we need to parse them to get the real names
+ * @param relation
+ * @param names
+ * @return char**
+ */
 static char **osl_relation_strings(osl_relation_p relation, osl_names_p names)
 {
   char **strings;

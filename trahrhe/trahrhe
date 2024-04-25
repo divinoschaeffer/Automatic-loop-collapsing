@@ -1,0 +1,471 @@
+#! /bin/bash
+
+#===--- trahrhe ----------------------------------------------------------===#
+#
+# TRAHRHE - Computation of Trahrhe Expressions and related functions
+#           Application code generation
+#
+#===----------------------------------------------------------------------===#
+#
+# The BSD 3-Clause License
+#
+# Copyright (c) 2019. INRIA, CNRS and University of Strasbourg
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its contributors
+#    may be used to endorse or promote products derived from this software
+#    without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+# Main Contributor:
+#     Philippe Clauss     <clauss@unistra.fr>
+#
+#===----------------------------------------------------------------------===#
+
+#### HELP function ####
+print_usage() {
+    echo "Usage: $0 -d\"domain\" [OPTION]"
+    echo " "
+    echo "  -d\"domain\": specifies the initial domain in iscc format and enclosed in double quotes (compulsory flag); computes the trahrhe expressions and related functions."
+    echo "  example: $0 -d\"[NMAX] -> { [t1,t2,t3] : 0 <= t1 <= NMAX-1 and 0 <= t2 <= NMAX-1 and t1 <= t3 <= NMAX-1 and NMAX>=1}\""
+    echo " "
+    echo "  -s\"suffix\": specifies a suffix for the function names generated in the header file (to be used with option -e)."
+    echo " "
+    echo "  -t #tiling_levels: computes the trahrhe expressions and related functions required for algebraic tiling of #tiling_levels nested loops."
+    echo "  example: $0 -d\"[NMAX] -> { [t1,t2,t3] : 0 <= t1 <= NMAX-1 and 0 <= t2 <= NMAX-1 and t1 <= t3 <= NMAX-1 and NMAX>=1}\" -t2"
+    echo " "
+    echo "  -r: prints math results or tiling math infos (whenever flag -t is used or not)."
+    echo " "
+    echo "  -e: generates a C header file named \"trahrhe_header.h\" in the current directory, that is required by the verification code trahrhe_verification.c and that can be used by any C code for code optimization. The file includes function definitions regarding Ehrhart polynomials and Trahrhe expressions. By default, the code is generated using standard math functions of the C library with complex long double operands (see character 'm' in the mask for arbitrarily high precision and correct rounding using MPC)."
+    echo " "
+    echo "  -v: generates a C verification code for Trahrhe expressions named \"trahrhe_verification.c\" in the current directory. The file includes a loop nest scanning the initial domain and performing verifications regarding the correctness of the generated Trahrhe expressions. When running, detected errors are reported in file \"trahrhe_ERRORS.txt\", if any. Note that the execution may last a long time for large parameters values; small values may be sufficient to test the Trahrhe expressions. The C code must be compiled using flags -lm -lmpc."
+    echo "      If flag -t #tiling_levels is conjointly used, generates a C verification code where the #tiling_levels outermost original loops are tiled, named \"trahrhe_tiling.c\", and an associated header file named \"trahrhe_tiling_header.h\" that can be used by any C code for algebraic tiling optimization. This code allows to tune the tile volumes to ensure a correct execution. When running, detected errors are reported in file \"trahrhe_tiling_ERRORS.txt\", if any. It may also be used as a code pattern to algebraic-tile-transform a given target code that includes an equivalent loop nest. The C code must be compiled using flags -lm -lmpc."
+    echo " "
+    echo "  -p: generates a parallel C OpenMP verification code, if -v has been set. If -t has been set, the code will be named \"trahrhe_tiling_parallel.c\", else it will be named \"trahrhe_verification_parallel.c\". The code must be compiled using flags -lm -lmpc -fopenmp."
+    echo " "
+    echo "  -m\"mask\": if the option -e is set, choose the method of generation for each trahrhe function in the header according to the mask. Each character in the mask should be set to one of the following:"
+    echo "              'r': calculate roots"
+    echo "              'p': calculate roots using precision correction. This fixes precision problems due to the use of doubles by adjusting the value of the root."
+    echo "              'm': calculate roots using MPC library. This library allows the arithmetic of complex numbers with arbitrarily high precision and correct rounding. The MPC precision is set to 128 by default - which is suitable for most cases -, and may be changed by modifying the macro MPC_PRECISION in trahrhe_header.h."
+    echo "              '&': calculate roots using precision correction & MPC library"
+    echo "              'd': find root using dichotomy"
+    echo "              'D': find root using accelerated dichotomy. It uses the fact that it is likely that pc is greater than in the previous call. If this is the case and if the parameters are the same, the lower bound used for finding the root is the latest root found, instead of the minimum according to the domain."
+#    echo "              'g': find root using GSL (yet to implement)"
+#    echo "              'G': find root using accelerated GSL (yet to implement)"
+    echo "            Thus, the length of the mask should be the number of trahrhe functions. For the sake of simplicity of use, the mask can be only one character. In this case, all trahrhe functions will be generated using the same method. If no mask is given, the mask \"r\" is assumed."
+    echo "  examples:"
+    echo "    $0 -d\"[NMAX] -> { [t1,t2,t3] : 0 <= t1 <= NMAX-1 and 0 <= t2 <= NMAX-1 and t1 <= t3 <= NMAX-1 and NMAX>=1}\" -e -m\"pdd\""
+    echo "    $0 -d\"[NMAX] -> { [t1,t2,t3] : 0 <= t1 <= NMAX-1 and 0 <= t2 <= NMAX-1 and t1 <= t3 <= NMAX-1 and NMAX>=1}\" -e -m\"a\""
+    echo "    $0 -d\"[NMAX] -> { [t1,t2,t3] : 0 <= t1 <= NMAX-1 and 0 <= t2 <= NMAX-1 and t1 <= t3 <= NMAX-1 and NMAX>=1}\" -t2 -e -m\"&r\""
+    echo " "
+    echo "  -h: prints this help."
+    echo " "
+}
+
+#### Function to minimize the length of algebraic expressions ####
+MinLong() {
+    typeset lmin
+    typeset etemp
+    typeset ltemp
+    expression="$(echo $expression | tr -d ' ' | tr -d '\n')"
+    lmin=${#expression}
+    etemp=$(echo "display2d:false$ factor($expression);" | maxima --very-quiet)
+    etemp=$(echo "$etemp" | tr -d ' ' | tr -d '\n')
+    ltemp=${#etemp}
+    if ((ltemp < lmin)); then
+        expression="$etemp"
+        lmin="$ltemp"
+    fi
+    # radcan must be avoided : bad results for equation solving
+    #  etemp=$(echo "display2d:false$ radcan($expression);" | maxima --very-quiet)
+    #  etemp=$(echo $etemp | tr -d ' ' | tr -d '\n')
+    #  ltemp=${#etemp}
+    #  if (( ltemp < lmin ))
+    #  then
+    #    expression=$etemp
+    #    lmin=$ltemp
+    #  fi
+    etemp=$(echo "display2d:false$ horner($expression);" | maxima --very-quiet)
+    etemp=$(echo "$etemp" | tr -d ' ' | tr -d '\n')
+    ltemp=${#etemp}
+    if ((ltemp < lmin)); then
+        expression="$etemp"
+        lmin="$ltemp"
+    fi
+    etemp=$(echo "display2d:false$ ratsimp($expression);" | maxima --very-quiet)
+    etemp=$(echo "$etemp" | tr -d ' ' | tr -d '\n')
+    ltemp=${#etemp}
+    if ((ltemp < lmin)); then
+        expression="$etemp"
+        lmin="$ltemp"
+    fi
+} # fin MinLong
+
+echo " "
+echo "****************************** TRAHRHE EXPRESSIONS ******************************"
+echo " "
+
+d_flag=''
+
+s_flag=''
+
+t_flag=''
+
+r_flag=''
+e_flag=''
+v_flag=''
+p_flag=''
+
+m_flag=''
+
+h_flag=''
+
+# TODO: put space in getopts string?? Does it work?
+while getopts 'd:s:t:revpm:h' flag; do
+    case "${flag}" in
+    d) #### Main Domain stored in D and well-shaped by ISCC + multiplications with '*' ####
+        D=$(echo "P:=${OPTARG};coalesce P;" | iscc | sed 's/\([ (+-][0-9][0-9]*\)\([A-Z_a-z]\)/\1\*\2/g')
+        d_flag='true'
+        Empty=$(echo "params $D;" | iscc)
+        if [[ ${Empty} == "{  :  }" ]]; then
+          D="[NOT_A_PARAMETER]->${D}"
+        fi
+        ;;
+
+    s) user_function_suffix="${OPTARG}"
+        s_flag='true'
+        ;;
+
+    t)
+        t_flag='true'
+        #### Tiling depth stored in tprof ####
+        tprof="${OPTARG}"
+        ;;
+
+    r) r_flag='true' ;;
+    e) e_flag='true' ;;
+    v) v_flag='true' ;;
+    p) p_flag='true' ;;
+
+    m)
+        m_flag='true'
+        masque="${OPTARG}"
+        ;;
+
+    h)
+        print_usage
+        exit 0
+        ;;
+
+    *)
+        print_usage
+        exit 1
+        ;;
+    esac
+done
+
+if [ "${d_flag}" = '' ]; then
+    echo "**** At least a domain must be provided! ****"
+    echo " "
+    print_usage
+    exit 1
+fi
+
+if [ "${v_flag}" = '' -a "${e_flag}" = '' -a "${r_flag}" = '' ]; then
+    r_flag='true'
+fi
+
+if [ "$e_flag" = "" -a "$m_flag" = "true" ]; then
+    echo "Warning: Flag -e is not set so the mask in unused."
+fi
+
+OLDIFS=$IFS
+
+#### External Tools ####
+
+#### Fraction to Floor of Fraction ####
+F2F="Frac2Floor/Frac2Floor"
+P2M="Pourcent2Mod/Pourcent2Mod"
+EFC="FloorCeilExtract/FloorCeilExtract"
+
+#for F2F in $(find ~ -name "Frac2Floor" -print -executable 2>/dev/null)
+#do
+#  if [ ! -d "$F2F" ]
+#  then
+#    break
+#  fi
+#done
+
+#### Domain Equations to C conditions ####
+D2C="Dom2Cond/Dom2Cond"
+
+#for D2C in $(find ~ -name "Dom2Cond" -print -executable 2>/dev/null)
+#do
+#  if [ ! -d "$D2C" ]
+#  then
+#    break
+#  fi
+#done
+
+#### Maxima Equations to C code ####
+M2Cint="Maxima2Cint/Maxima2Cint"
+M2Cfloat="Maxima2Cfloat/Maxima2Cfloat"
+
+#for M2C in $(find ~ -name "Maxima2C" -print -executable 2>/dev/null)
+#do
+#  if [ ! -d "$M2C" ]
+#  then
+#    break
+#  fi
+#done
+
+#### Maxima Equations to MPC code ####
+MPC="Maxima2MPC/Maxima2MPC"
+
+#for MPC in $(find ~ -name "Maxima2MPC" -print -executable 2>/dev/null)
+#do
+#  if [ ! -d "$MPC" ]
+#  then
+#    break
+#  fi
+#done
+
+#### Lexical values of the variables stored in array NAME in lexicographic order ####
+#### N = Problem Dimension ####
+listevar=$(echo "$D" | sed 's/.*\[.*\].*\[\(.*\)\].*/\1/')
+IFS=","
+N=0
+for var in $listevar; do
+    ((N++))
+    NAME[$N]=$(echo "$var" | tr -d ' ')
+done
+params=$(echo "$D" | sed 's/ *\[\(.*\)\].*\[.*\].*/\1/')
+
+if [ "$e_flag" = "true" ]; then
+    repeat(){ for (( i=0; i < $2; i++ )); do echo -n "$1"; done; }
+    if [ "$t_flag" = "true" ]; then
+        longueur_masque="$tprof"
+    else
+        longueur_masque="$N"
+    fi
+    if [ "$m_flag" = "true" ]; then
+        if [ "${#masque}" != "$longueur_masque" -a "${#masque}" != 1 ]; then
+            # Fail because of invalid length
+            if [ "$t_flag" = "true" ]; then
+                echo "Mask format error: its length should be equal to 1, or to the number of tiling levels (argument of -t)." >&2
+            else
+                echo "Mask format error: its length should be equal to 1, or to the number of variables." >&2
+            fi
+            print_usage
+            exit 1
+        fi
+        if [[ ! "$masque" =~ ^[rpm\&dDgG]*$ ]]; then
+            # Fail because of invalid format
+            echo "($masque)"
+            echo "Mask format error: the authorized characters are \"rpm&dDgG\"." >&2
+            print_usage
+            exit 1
+        fi
+        if [ "${#masque}" = 1 ]; then
+            # Convert to full-length mask
+            masque=$(repeat $masque $longueur_masque)
+        fi
+    else
+        # Mode de génération par défaut : calcul des racines
+        masque=$(repeat r $longueur_masque)
+    fi
+fi
+
+#Début partie mathématique
+
+typeset -A R RSA DSA VAR NDOM NPeriod RS DS ehrhart dehrhart R
+typeset -A VarPeriodic pcminPeriod
+typeset -A Dom nsol
+
+typeset -A vlexmin
+typeset -A vlexmax
+typeset -A dlexmin
+typeset -A dlexmax
+
+typeset -A pcmin nehrhart
+typeset -A pcmax
+
+typeset -A vlexminint vlexmaxint
+typeset -A dlexminint dlexmaxint
+typeset -A NPCMININT NPCMAXINT NPCMAX NPCMIN
+typeset -A Params Entete EnteteParams listevar listevar0 listevar_blancs
+typeset -A listevar1
+
+typeset -A lD
+
+typeset -A trahrhe
+
+typeset CVAR
+
+#### Flag set to 1 when some Trahrhe expression can not be computed: then no header of verification code is generated ####
+nocode=0
+
+#if [ "${r_flag}" = 'true' -o "${v_flag}" = 'true' -o "${e_flag}" = 'true' ]; then
+if [ "${t_flag}" = '' ]; then
+    #### Trahrhe computations without tiling ####
+    echo "Mathematical calculations started"
+    . trahrhe_math.sh
+    DT="$D"
+    CVAR="x"
+    trahrhe_math
+    #echo -e "\b\b\b\b\b\b\bcompleted\n"
+    echo "Mathematical calculations completed"
+fi
+
+if [ "${t_flag}" = 'true' ]; then
+    #### Trahrhe computations with tiling ####
+    typeset -A ehrhart dehrhart VAR R Dom NDOM RS DS RSA DSA nsol NPCMIN NPCMAX nehrhart TILEMAX DOMTILEMAX
+    typeset -A vlexmin
+    typeset -A vlexmax
+    typeset -A dlexmin
+    typeset -A dlexmax
+    typeset -A pcmin
+    typeset -A pcmax
+    typeset -A vlexminint vlexmaxint
+    typeset -A dlexminint dlexmaxint
+    typeset -A listevar1
+    typeset -A trahrhe NPeriod pcminPeriod VarPeriodic
+    #typeset Entete EnteteParams listevar listevar0 listevar_blancs Params
+    typeset -A Params Entete EnteteParams listevar listevar0 listevar_blancs
+    typeset ntilemax ListeTileMin
+
+    #### Flag set to 1 when some Trahrhe expression can not be computed: then no header of verification code is generated ####
+    nocode=0
+
+    #list_var=$(echo "$D" | sed 's/.*\[.*\].*\[\(.*\)\].*/\1/')
+    #IFS=","
+    #i=1
+    #for var in $list_var
+    #do
+    #  NV[$i]=$(echo "$var" | tr -d ' ')
+    #  (( i++ ))
+    #done
+    #(( i-- ))
+
+    if ((tprof < 1 || tprof > N)); then
+        echo "**** The number of tiled levels can only be between 1 and $N ****"
+        echo " "
+        exit 1
+    fi
+
+    . trahrhe_math_tiling.sh
+    #echo -n "Mathematical calculations for tiling started"
+    echo "Mathematical calculations for algebraic tiling started"
+    #### Computations for each tiling level in lexicographic order ####
+    IFS=","
+    i=1
+    for var in $listevar; do
+        #if (( (i <= tprof) || ((i <= tprof+1) && (tprof < N)) ))
+        if ((i <= tprof)); then
+            echo "-- Tiling depth $i"
+            trahrhe_math_tiling "$var" "$i"
+        else
+            break
+        fi
+        ((i++))
+    done
+    #echo -e "\b\b\b\b\b\b\bcompleted\n"
+    echo "Mathematical calculations completed"
+    echo " "
+    if [ "${e_flag}" = "true" ]; then
+        if (($nocode == 0)); then
+            echo -n "Header for algebraic tiling code generation started"
+            #if (( tprof < N ))
+            #then
+            #  temp_tprof=$(( tprof+1 ))
+            #else
+            #  temp_tprof=$tprof
+            #fi
+            temp_tprof=$tprof
+            . trahrhe_generate_tiling_header.sh
+            generate_tiling_header "$temp_tprof"
+            echo -e "\b\b\b\b\b\b\bcompleted: trahrhe_tiling_header.h\n"
+            if [ "${v_flag}" = "true" ]; then
+                if [ "${p_flag}" = '' ]; then
+                    echo -n "Algebraic tiling verification code generation started"
+                    . trahrhe_generate_tiled_code.sh
+                    generate_tiling_code "$tprof"
+                    echo -e "\b\b\b\b\b\b\bcompleted: trahrhe_tiling.c\n"
+                else
+                    echo -n "Algebraic tiling parallel verification code generation started"
+                    . trahrhe_generate_parallel_tiled_code.sh
+                    generate_parallel_tiling_code "$tprof"
+                    echo -e "\b\b\b\b\b\b\bcompleted: trahrhe_tiling_parallel.c\n"
+                fi
+            fi
+        else
+            echo "**** Some Trahrhe Expression(s) could not be computed => no code could be generated ****"
+            exit 1
+        fi
+    else # r_flag='true'
+        read -s -n1 -p "Press any key to continue..."; echo
+        . trahrhe_print_tiling_info.sh
+        print_tiling_info "$tprof"
+    fi
+fi
+
+#Fin partie mathématique
+
+# Affichage des résultats
+
+if [ "${r_flag}" = "true" -a "${t_flag}" = '' ]; then
+    read -s -n1 -p "Press any key to continue..."; echo
+    . trahrhe_print_math_results.sh
+    print_math_results
+fi
+if [ "${t_flag}" = '' ]; then
+    if [ "${e_flag}" = "true" ]; then
+        if (($nocode == 0)); then
+            echo -n "Header code generation started"
+            . trahrhe_generate_header.sh
+            generate_header
+            echo -e "\b\b\b\b\b\b\bcompleted: trahrhe_header.h\n"
+            if [ "${v_flag}" = "true" ]; then
+                if [ "${p_flag}" = '' ]; then
+                    echo -n "Verification code generation started"
+                    . trahrhe_generate_verification_code.sh
+                    generate_verification_code
+                    echo -e "\b\b\b\b\b\b\bcompleted: trahrhe_verification.c\n"
+                else
+                    echo -n "Parallel verification code generation started"
+                    . trahrhe_generate_parallel_verification_code.sh
+                    generate_parallel_verification_code
+                    echo -e "\b\b\b\b\b\b\bcompleted: trahrhe_verification_parallel.c\n"
+                fi
+            fi
+        else
+            if [ "${r_flag}" = '' ]; then
+                echo "**** Some Trahrhe Expression(s) could not be computed  => no code could be generated ****"
+                exit 1
+            fi
+        fi
+    fi
+fi
+
+exit 0

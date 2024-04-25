@@ -1,9 +1,12 @@
 /**
- * @file codegen.c
  * @author SORGHO Nongma
  * @brief Edits an OpenSCoP representation to generate an output code where loops are collapsed.
- * @version 0.1
+ * @version 0.9
  * @date 2024-02-09
+ * @details The code generation is done in three steps:
+ * 1. Generate the code for each boundary
+ * 2. Generate the header file for each boundary
+ * 3. Merge the generated code with the original code
  * @copyright Copyright (c) 2024
  */
 
@@ -14,9 +17,12 @@ extern TCD_FlowData *tcdFlowData;
 
 unsigned boundary_index = 0;
 
+/**
+ * @brief Writes the initialisation section of the generated code.
+ * @param boundary
+ */
 void write_init_section(TCD_Boundary boundary)
 {
-    char *outer_var = boundary->outerLoopVar;
     char *outer_var_bounds = boundary->outerLoopUpperBound;
     char *iteration_domains = boundary->iterationDomainsString;
     char **name_array = boundary->nameArray;
@@ -47,9 +53,7 @@ void write_init_section(TCD_Boundary boundary)
     {
         // Construct variables on which the iteration variable depends
         char *vars = (char *)malloc(1024 * sizeof(char));
-        char *tmp = (char *)malloc(1024 * sizeof(char));
 
-        strcpy(tmp, outer_var_bounds);
         sprintf(vars, "pc_%d", boundary_index);
 
         // add iteration variables from start to curr_depth
@@ -59,23 +63,12 @@ void write_init_section(TCD_Boundary boundary)
             strcat(vars, name_array[i + 1]);
         }
 
-        // take only first curr_depth parameters
-        char *token = strtok(tmp, ",");
-        int token_count = 0;
-        do
+        if (outer_var_bounds != NULL && outer_var_bounds[0] != '\0')
         {
-            if (token_count <= max_depth)
-            {
-                strcat(vars, ",");
-                strcat(vars, token);
-            }
-            else
-            {
-                break;
-            }
-            token_count++;
-            token = strtok(NULL, ",");
-        } while (token != NULL);
+            strcat(vars, ",");
+            strcat(vars, outer_var_bounds);
+        }
+
         fs_writef("%s = trahrhe_%s%d(%s);", name_array[curr_depth + 1], name_array[curr_depth + 1], boundary_index, vars);
 
         curr_depth++;
@@ -87,18 +80,16 @@ void write_init_section(TCD_Boundary boundary)
     fs_untabular();
 }
 
-char *take(int index, char *string)
-{
-    char *tmp = (char *)malloc(1024 * sizeof(char));
-    strcpy(tmp, string);
-    char *token = strtok(tmp, ",");
-    for (int i = 0; i < index; i++)
-    {
-        token = strtok(NULL, ",");
-    }
-    return token;
-}
-
+/**
+ * @brief Increments the loop variables
+ * @param curr_depth
+ * @param outer_var_bounds
+ * @param name_array
+ * @param stop_conditions
+ * @param stop_conditions_int
+ * @param options
+ * @return
+ */
 void increment(int curr_depth,
                char *outer_var_bounds,
                char **name_array,
@@ -146,7 +137,7 @@ void increment(int curr_depth,
     fs_tabular();
 
     fs_writef("%s++;", name_array[curr_depth]);
-    if (stop_conditions_int[curr_depth - 1] == 0)
+    if (stop_conditions_int[curr_depth - 1] == 1)
     {
         fs_writef("%s = %s - 1;", name_array[curr_depth + 1], name_array[curr_depth]);
     }
@@ -161,11 +152,17 @@ void increment(int curr_depth,
     fs_writef("}");
 }
 
+/**
+ * @brief Writes the increment section of the generated code
+ * @details The increment section is the part of the code that increments the loop variables
+ * @param boundary
+ * @param stop_conditions
+ * @param stop_conditions_int
+ * @param options
+ */
 void write_increment_section(TCD_Boundary boundary, struct clast_expr *stop_conditions[], int *stop_conditions_int, CloogOptions *options)
 {
-    char *outer_var = boundary->outerLoopVar;
     char *outer_var_bounds = boundary->outerLoopUpperBound;
-    char *iteration_domains = boundary->iterationDomainsString;
     char **name_array = boundary->nameArray;
 
     int max_depth = tcdFlowData->collapseParameters[boundary_index];
@@ -175,6 +172,10 @@ void write_increment_section(TCD_Boundary boundary, struct clast_expr *stop_cond
     fs_untabular();
 }
 
+/// @brief Generates the code segment for a given boundary
+/// @param root
+/// @param options
+/// @param boundary
 void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Boundary boundary)
 {
     // Initialisation code
@@ -210,12 +211,12 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
             if (for_stmt->UB != NULL)
             {
                 stop_conditions[loop_nest_depth - 1] = for_stmt->UB;
-                stop_conditions_int[loop_nest_depth - 1] = 1;
+                stop_conditions_int[loop_nest_depth - 1] = 0;
             }
             else
             {
                 stop_conditions[loop_nest_depth - 1] = for_stmt->LB;
-                stop_conditions_int[loop_nest_depth - 1] = 0;
+                stop_conditions_int[loop_nest_depth - 1] = 1;
             }
             loop_nest_depth--;
         }
@@ -271,10 +272,11 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
     fs_writef("//end//\n");
 }
 
+/// @brief Generates the output code where loops are collapsed
+/// @param boundaryList
 void generateCode(TCD_BoundaryList boundaryList)
 {
     osl_scop_p scop = tcdFlowData->scop;
-    osl_statement_p statement;
 
     CloogState *state;
     CloogInput *input;
@@ -326,15 +328,37 @@ void generateCode(TCD_BoundaryList boundaryList)
     fs_close();
 }
 
+/**
+ * @brief Generates the header file for a given boundary
+ * @param boundary
+ * @param outputFile
+ * @param boundary_index
+ */
 void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundary_index)
 {
-    char *isl_domain = boundary->firstIterDomainOfUnion->first->iterationDomain;
+    char *isl_domain = boundary->firstIterationDomainOfUnion->first->iterationDomain;
 
     printf("isl_domain: %s\n", isl_domain);
 
     char *bash_command = (char *)malloc(1024 * sizeof(char));
-    sprintf(bash_command, "cd trahrhe-4.1 && ./trahrhe -d\"%s\" -s\"%d\" -e", isl_domain, boundary_index);
-    // output file is trahrhe-4.1/trahrhe_header.h
+    char *trahrhe_install_directory = (char *)malloc(1024 * sizeof(char));
+    if (getenv("TRAHRHE_INSTALL_DIR") == NULL)
+    {
+        const char *trahrhe_warning_message = "Warning: TRAHRHE_INSTALL_DIR not defined.\n"
+                                              "Using default value path: ./trahrhe assuming trahrhe is\n"
+                                              "in the same directory as the compiler.\n"
+                                              "To set the path, please define the environment variable TRAHRHE_INSTALL_DIR\n"
+                                              "with the path to the trahrhe directory.\n"
+                                              "Example: export TRAHRHE_INSTALL_DIR=/path/to/trahrhe\n";
+        fprintf(stderr, trahrhe_warning_message);
+        strcpy(trahrhe_install_directory, "./trahrhe");
+    }
+    else
+    {
+        strcpy(trahrhe_install_directory, getenv("TRAHRHE_INSTALL_DIR"));
+    }
+
+    sprintf(bash_command, "cd %s/trahrhe -d\"%s\" -s\"%d\" -e", trahrhe_install_directory, isl_domain, boundary_index);
     FILE *tmp = fopen("tmp.sh", "w+");
     if (tmp == NULL)
     {
@@ -346,10 +370,13 @@ void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundar
     system("chmod +x tmp.sh && ./tmp.sh");
     remove("tmp.sh");
 
-    FILE *headerFile = fopen("trahrhe-4.1/trahrhe_header.h", "r");
+    char *headerFilename = (char *)malloc(1024 * sizeof(char));
+    sprintf(headerFilename, "%s/trahrhe_header.h", trahrhe_install_directory);
+
+    FILE *headerFile = fopen(headerFilename, "r");
     if (headerFile == NULL)
     {
-        fprintf(stderr, "Error: Unable to open file trahrhe-4.1/trahrhe_header.h\n");
+        fprintf(stderr, "Error: Unable to open file %s\n", headerFilename);
         exit(EXIT_FAILURE);
     }
 
@@ -365,11 +392,15 @@ void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundar
 
     fprintf(outputFile, "%s", string);
 
-    remove("trahrhe-4.1/trahrhe_header.h");
+    remove(headerFilename);
 
-    free(bash_command);
+    free(trahrhe_install_directory);
+
+    // free(bash_command);
 }
 
+/// @brief Generates the header file for all the boundaries of a given input
+/// @param boundaryList
 void generateHeaderFile(TCD_BoundaryList boundaryList)
 {
     char *headerFilename = (char *)malloc(1024 * sizeof(char));
@@ -393,6 +424,8 @@ void generateHeaderFile(TCD_BoundaryList boundaryList)
     }
 }
 
+/// @brief Merges the generated code with the original code
+/// @details Uses a shell script
 void mergeGeneratedCode()
 {
     char *command = (char *)malloc(1024 * sizeof(char));
@@ -413,14 +446,15 @@ void mergeGeneratedCode()
 
     system(command);
 
-    free(command);
-    free(pwd);
+    // free(command);
+    // free(pwd);
 }
 
+/// @brief Removes the temporary files
 void removeTemporaryFiles()
 {
     char *command = (char *)malloc(1024 * sizeof(char));
     sprintf(command, "rm %s.c %s %s %s", INTERMEDIATE_FILENAME, SCOPED_FILENAME, COLLAPSE_PARAMETERS_FILENAME, "tmp.c");
     system(command);
-    free(command);
+    // free(command);
 }

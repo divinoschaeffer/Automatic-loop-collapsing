@@ -23,6 +23,18 @@ void tabString(FILE *file, char *string, long fsize)
     fprintf(file, "%s", tabbedString);
 }
 
+char *take(int index, char *string)
+{
+    char *tmp = (char *)malloc(1024 * sizeof(char));
+    strcpy(tmp, string);
+    char *token = strtok(tmp, ",");
+    for (int i = 0; i < index; i++)
+    {
+        token = strtok(NULL, ",");
+    }
+    return token;
+}
+
 char *tabStringReturn(char *string, long fsize)
 {
     char *tabbedString = (char *)malloc((fsize + 1) * sizeof(char));

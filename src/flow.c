@@ -13,6 +13,11 @@
  */
 TCD_FlowData *tcdFlowData;
 
+/**
+ * @brief Initializes the TCD_FlowData structure
+ * @param inputFilename
+ * @param outputFilename
+ */
 void initTcdFlow(char *inputFilename, char *outputFilename)
 {
     tcdFlowData = (TCD_FlowData *)malloc(sizeof(TCD_FlowData));
@@ -46,7 +51,26 @@ void initTcdFlow(char *inputFilename, char *outputFilename)
     free(bash_command);
 }
 
+void extractLoopsPolytope(void)
+{
+    osl_scop_p scop;
+    clan_options_p options;
+    /* Default option setting. */
+    options = clan_options_malloc();
+    /* Extraction of the SCoP. */
+    FILE *entryFile = fopen(tcdFlowData->entryFile, "r");
+    scop = clan_scop_extract(entryFile, options);
+    printf("Language: %s\n", scop->language);
+
+    tcdFlowData->scop = scop;
+}
+
+/**
+ * @brief Ends the TCD_FlowData structure
+ * @details Ends the TCD_FlowData structure by freeing the memory allocated
+ */
 void endTcdFlow(void)
 {
+    osl_scop_free(tcdFlowData->scop);
     free(tcdFlowData);
 }

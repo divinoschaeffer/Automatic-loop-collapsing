@@ -1,0 +1,85 @@
+This section provides a guide on how to use the Automatic Loop Collapsing tool.\hypertarget{md_docs_USAGE_autotoc_md8}{}\doxysection{Prerequisites}\label{md_docs_USAGE_autotoc_md8}
+Before using the Automatic Loop Collapsing tool, ensure that you have the following prerequisites\+:
+
+
+\begin{DoxyItemize}
+\item Installed all the dependencies as described in the \mbox{\hyperlink{md_docs_INSTALL}{installation guide}}.
+\item Familiarized yourself with the \mbox{\hyperlink{md_docs_FEATURE_DEFINITIONS}{feature definitions}}.
+\item Ensure that your input file is in the correct format i.\+e., it should contain the loops that you want to collapse along with the {\ttfamily \#pragma trahrhe collapse(\+N)} directive.
+\end{DoxyItemize}\hypertarget{md_docs_USAGE_autotoc_md9}{}\doxysection{Steps}\label{md_docs_USAGE_autotoc_md9}
+To use the Automatic Loop Collapsing tool, follow these steps\+:
+
+
+\begin{DoxyEnumerate}
+\item Clone the repository\+:
+\end{DoxyEnumerate}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{git clone}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyEnumerate}
+\item Navigate to the {\ttfamily Automatic-\/loop-\/collapsing} directory\+:
+\item Run the following command\+:
+\end{DoxyEnumerate}
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(collapse) [input.c] -\/o [output.c]}
+
+\end{DoxyCode}
+
+
+You can also specify additional options that are\+:
+\begin{DoxyItemize}
+\item {\ttfamily -\/h} or {\ttfamily -\/-\/help}\+: Display the help message.
+\item {\ttfamily -\/v} or {\ttfamily -\/-\/version}\+: Display the version of the tool.
+\item {\ttfamily -\/o} or {\ttfamily -\/-\/output}\+: Specify the output file.
+\end{DoxyItemize}
+
+The tool will automatically collapse the loops in the input file and generate the output file.\hypertarget{md_docs_USAGE_autotoc_md10}{}\doxysection{Example}\label{md_docs_USAGE_autotoc_md10}
+Consider the following example\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{preprocessor}{\#pragma trahrhe collapse(2)}}
+\DoxyCodeLine{\textcolor{keywordflow}{for}(i = 0; i < N -\/ 1; i++) \{}
+\DoxyCodeLine{    \textcolor{keywordflow}{for}(j = i + 1; j < N; j++) \{}
+\DoxyCodeLine{        \textcolor{keywordflow}{for}(k = 0; k < N; k++) \{}
+\DoxyCodeLine{            A[i][j] += B[k][i] * C[k][j];}
+\DoxyCodeLine{        \}}
+\DoxyCodeLine{        A[j][i] = A[i][j];}
+\DoxyCodeLine{    \}}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{\textcolor{preprocessor}{\#pragma endtrahrhe}}
+
+\end{DoxyCode}
+
+
+After running the tool, the output file would be\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} pc\_0;}
+\DoxyCodeLine{\textcolor{keywordtype}{unsigned} upper\_bound\_0 = i\_Ehrhart0(N);}
+\DoxyCodeLine{\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} first\_iteration\_0 = 1;}
+\DoxyCodeLine{\textcolor{preprocessor}{\#pragma omp parallel for private(i, j, k) firstprivate(first\_iteration\_0) schedule(static)}}
+\DoxyCodeLine{\textcolor{keywordflow}{for}(pc\_0 = 1; pc\_0 <= upper\_bound\_0; pc\_0++) \{}
+\DoxyCodeLine{    \textcolor{keywordflow}{if}(first\_iteration\_0) \{}
+\DoxyCodeLine{        i = i\_trahrhe0(pc\_0, N);}
+\DoxyCodeLine{        j = j\_trahrhe0(pc\_0, N, i);}
+\DoxyCodeLine{        first\_iteration\_0 = 0;}
+\DoxyCodeLine{    \}}
+\DoxyCodeLine{    \textcolor{keywordflow}{for}(k = 0; k < N; k++) \{}
+\DoxyCodeLine{        A[i][j] += B[k][i] * C[k][j];}
+\DoxyCodeLine{    \}}
+\DoxyCodeLine{    A[j][i] = A[i][j];}
+\DoxyCodeLine{    j++;}
+\DoxyCodeLine{    \textcolor{keywordflow}{if}(j >= N) \{}
+\DoxyCodeLine{        i++;}
+\DoxyCodeLine{        j = i + 1;}
+\DoxyCodeLine{    \}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+ 

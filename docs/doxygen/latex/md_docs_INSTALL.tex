@@ -1,0 +1,43 @@
+
+\begin{DoxyItemize}
+\item \href{https://gmplib.org/}{\texttt{ GMP}}
+\item \href{http://www.shoup.net/ntl/}{\texttt{ NTL}}
+\item \href{https://www.irisa.fr/polylib/}{\texttt{ Polylib}}
+\item \href{https://repo.or.cz/isl.git}{\texttt{ isl}}
+\item \href{https://github.com/libntl/ntl.git}{\texttt{ ntl}}
+\item \href{https://repo.or.cz/barvinok.git}{\texttt{ Barvinok}}
+\item \href{https://webpages.gitlabpages.inria.fr/trahrhe/download}{\texttt{ trahrhe}}
+\item \href{https://icps.u-strasbg.fr/people/bastoul/public_html/development/openscop/}{\texttt{ osl}}
+\item \href{https://github.com/periscop/clan.git}{\texttt{ clan}}
+\item \href{http://www.cloog.org/}{\texttt{ cloog}}
+\end{DoxyItemize}
+
+To install Barvinok, you need to follow these steps\+:
+
+
+\begin{DoxyEnumerate}
+\item Get GMP using the procedure described in \href{https://libntl.org/doc/tour-gmp.html}{\texttt{ https\+://libntl.\+org/doc/tour-\/gmp.\+html}} (note the \$\+HOME/sw)
+\item Get NTL using the info in this same page
+\item Get ISL
+\item You should now be able to get Barvinok 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{. ./configure -\/-\/with-\/isl=bundled}
+\DoxyCodeLine{make}
+\DoxyCodeLine{make install}
+
+\end{DoxyCode}
+
+\end{DoxyEnumerate}
+
+\DoxyHorRuler{0}
+ You may need to create a symbolic link to the library in the {\ttfamily /usr/lib} directory. You can do this by running the following command\+:
+
+{\ttfamily sudo ln -\/s /usr/local/lib/libbarvinok.so.\+0 /usr/lib/libbarvinok.so.\+0}\hypertarget{md_docs_INSTALL_autotoc_md5}{}\doxysection{\#\# Troubleshooting}\label{md_docs_INSTALL_autotoc_md5}
+If you are having trouble with the installation of the library, you can try the following commands to copy the library to the {\ttfamily /usr/lib} directory (assuming you have the library in {\ttfamily /usr/local/lib} directory)\+:
+
+{\ttfamily sudo cp /usr/local/lib/lib$<$LIB\+\_\+\+NAME$>$$\ast$ /usr/lib}
+
+\DoxyHorRuler{0}
+ If your machine is missing {\ttfamily autoreconf} command, you can install it by running the following command\+:
+
+{\ttfamily apt-\/get install dh-\/autoreconf} 
