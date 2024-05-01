@@ -90,7 +90,6 @@ static void kernel_correlation(int m, int n,
         stddev[j] = stddev[j] <= eps ? SCALAR_VAL(1.0) : stddev[j];
     }
 
-#pragma trahrhe collapse(2)
     /* Center and reduce the column vectors. */
     for (i = 0; i < _PB_N; i++)
         for (j = 0; j < _PB_M; j++)
@@ -98,20 +97,34 @@ static void kernel_correlation(int m, int n,
             data[i][j] -= mean[j];
             data[i][j] /= SQRT_FUN(float_n) * stddev[j];
         }
-#pragma endtrahrhe
 
     /* Calculate the m * m correlation matrix. */
-    for (i = 0; i < _PB_M - 1; i++)
+    for (i = 0; i < _PB_M-1; i++)
     {
-        corr[i][i] = SCALAR_VAL(1.0);
-        for (j = i + 1; j < _PB_M; j++)
+      corr[i][i] = SCALAR_VAL(1.0);
+      for (j = i+1; j < _PB_M; j++)
         {
-            corr[i][j] = SCALAR_VAL(0.0);
-            for (k = 0; k < _PB_N; k++)
-                corr[i][j] += (data[k][i] * data[k][j]);
-            corr[j][i] = corr[i][j];
+          corr[i][j] = SCALAR_VAL(0.0);
+        }
+
+    }
+
+    polybench_start_instruments;
+
+    #pragma trahrhe collapse(2) 
+    for (i = 0; i < _PB_M-1; i++)
+    {
+      for (j = i+1; j < _PB_M; j++)
+        {
+          for (k = 0; k < _PB_N; k++)
+            corr[i][j] += (data[k][i] * data[k][j]);
+          corr[j][i] = corr[i][j];
         }
     }
+    #pragma endtrahrhe
+
+    polybench_stop_instruments;
+
     corr[_PB_M - 1][_PB_M - 1] = SCALAR_VAL(1.0);
 }
 

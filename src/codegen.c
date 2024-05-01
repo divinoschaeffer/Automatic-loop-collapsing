@@ -358,7 +358,7 @@ void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundar
         strcpy(trahrhe_install_directory, getenv("TRAHRHE_INSTALL_DIR"));
     }
 
-    sprintf(bash_command, "cd %s/trahrhe -d\"%s\" -s\"%d\" -e", trahrhe_install_directory, isl_domain, boundary_index);
+    sprintf(bash_command, "cd %s && ./trahrhe -d\"%s\" -s\"%d\" -e", trahrhe_install_directory, isl_domain, boundary_index);
     FILE *tmp = fopen("tmp.sh", "w+");
     if (tmp == NULL)
     {

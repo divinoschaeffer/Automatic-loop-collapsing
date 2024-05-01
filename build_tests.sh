@@ -30,8 +30,8 @@ compile_test() {
         -o "$TESTS_BIN_DIR/$test_name" -lm -fopenmp -DPOLYBENCH_DUMP_ARRAYS -DMINI_DATASET \
         -I "$PROJECT_ROOT_DIR/tests/utilities" "$PROJECT_ROOT_DIR/tests/utilities/polybench.c"
 
-    local binary_file="./build/collapse"
-    chmod +x ./build/collapse
+    local binary_file="./trahrhe-collapse"
+    chmod +x ./trahrhe-collapse
 
     # get shorter path name
     entry_point=$(realpath --relative-to="$PROJECT_ROOT_DIR" "$entry_point")

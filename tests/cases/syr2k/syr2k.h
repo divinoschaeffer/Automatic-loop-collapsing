@@ -7,8 +7,8 @@
  *
  * Web address: http://polybench.sourceforge.net
  */
-#ifndef _SYMM_H
-# define _SYMM_H
+#ifndef _SYR2K_H
+# define _SYR2K_H
 
 /* Default to LARGE_DATASET. */
 # if !defined(MINI_DATASET) && !defined(SMALL_DATASET) && !defined(MEDIUM_DATASET) && !defined(LARGE_DATASET) && !defined(EXTRALARGE_DATASET)
@@ -77,4 +77,4 @@
 #  define POW_FUN(x,y) pow(x,y)
 # endif
 
-#endif /* !_SYMM_H */
+#endif /* !_SYR2K_H */

@@ -12,3 +12,6 @@ out
 out.*
 tests/build
 .vscode
+tests/cases/**/*_collapsed.*
+t.*
+to.*
