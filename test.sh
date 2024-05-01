@@ -1,7 +1,7 @@
 #!/bin/bash
 
-build_script="./build_test.sh"
-parent_directory="build/cases/"
+build_script="./build_tests.sh"
+parent_directory="tests/"
 
 # Vérification de l'existence du script de construction
 if [ -f "$build_script" ]; then

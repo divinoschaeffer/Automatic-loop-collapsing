@@ -199,7 +199,7 @@ TCD_Boundary getBoundary(osl_statement_p statement, osl_names_p names, int loop_
     }
     if (!is_in_union)
       continue;
-    if (depth != statement->domain->nb_rows - 1 && depth != start_row)
+    if (depth != statement->domain->nb_rows && depth != start_row)
       strcat(unuaryUnion, " and ");
 
     strcat(unuaryUnion, relation_buffer);
