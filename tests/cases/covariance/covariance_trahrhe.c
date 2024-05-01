@@ -83,8 +83,9 @@ static void kernel_covariance(int m, int n,
             cov[i][j] = SCALAR_VAL(0.0);
         }
 
-#pragma trahrhe collapse(2)
+    // #pragma trahrhe collapse(2)
     for (i = 0; i < _PB_M; i++)
+    {
         for (j = i; j < _PB_M; j++)
         {
             for (k = 0; k < _PB_N; k++)
@@ -92,7 +93,8 @@ static void kernel_covariance(int m, int n,
             cov[i][j] /= (float_n - SCALAR_VAL(1.0));
             cov[j][i] = cov[i][j];
         }
-#pragma endtrahrhe
+    }
+    // #pragma endtrahrhe
 }
 
 int main(int argc, char **argv)
