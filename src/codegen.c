@@ -186,10 +186,12 @@ void write_increment_section(TCD_Boundary boundary, struct clast_expr *stop_cond
     fs_untabular();
 }
 
-/// @brief Generates the code segment for a given boundary
-/// @param root
-/// @param options
-/// @param boundary
+/**
+ * @brief  Generates the code segment for a given boundary
+ * @param root
+ * @param options
+ * @param boundary
+ */
 void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Boundary boundary)
 {
     // Initialisation code
@@ -204,8 +206,6 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
         exit(EXIT_FAILURE);
     }
 
-    // DONE - Remove from scop the part that is not in the iteration domain (ie handled by manual code generation)
-    // while we are have not hit the depth of parallelism of the boundary, we need to go deeper in the loop nest
     int loop_nest_depth = tcdFlowData->collapseParameters[boundary_index];
     int max_depth = loop_nest_depth;
     struct clast_expr *stop_conditions[loop_nest_depth];
@@ -263,7 +263,6 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
             exit(EXIT_FAILURE);
         }
     }
-    // DONE: Get and put the actual statement code here (for now, they are displayed as functions)
 
     // Write the output
     clast_pprint(tmp, root, 0, options);
@@ -289,8 +288,10 @@ void generateCodeSegment(struct clast_stmt *root, CloogOptions *options, TCD_Bou
     fs_writef("//end//\n");
 }
 
-/// @brief Generates the output code where loops are collapsed
-/// @param boundaryList
+/**
+ * @brief  Generates the output code where loops are collapsed
+ * @param boundaryList
+ */
 void generateCode(TCD_BoundaryList boundaryList)
 {
     osl_scop_p scop = tcdFlowData->scop;
@@ -312,6 +313,7 @@ void generateCode(TCD_BoundaryList boundaryList)
 
     fs_open(outputFilename);
     fs_tabular();
+
     // generation
     TCD_Boundary boundary = boundaryList->first;
     while (boundary != NULL)
@@ -323,8 +325,6 @@ void generateCode(TCD_BoundaryList boundaryList)
             fprintf(stderr, "Error: Unable to generate input from scop\n");
             exit(EXIT_FAILURE);
         }
-
-        // cloog_input_dump_cloog(stdout, input, options);
 
         root = cloog_clast_create_from_input(input, options);
 
@@ -412,12 +412,13 @@ void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundar
     remove(headerFilename);
 
     free(trahrhe_install_directory);
-
-    // free(bash_command);
+    free(bash_command);
 }
 
-/// @brief Generates the header file for all the boundaries of a given input
-/// @param boundaryList
+/**
+ * @brief
+ * @param boundaryList
+ */
 void generateHeaderFile(TCD_BoundaryList boundaryList)
 {
     char *headerFilename = (char *)malloc(1024 * sizeof(char));
@@ -441,8 +442,10 @@ void generateHeaderFile(TCD_BoundaryList boundaryList)
     }
 }
 
-/// @brief Merges the generated code with the original code
-/// @details Uses a shell script
+/**
+ * @brief Merges the generated code with the original code
+ * @details Uses a shell script
+ */
 void mergeGeneratedCode()
 {
     char *command = (char *)malloc(1024 * sizeof(char));
@@ -462,16 +465,14 @@ void mergeGeneratedCode()
     sprintf(command, "%s/fusion/fusion.sh %s %s.c '#include \"%s.h\"' %s.c", pwd, tcdFlowData->entryFile, INTERMEDIATE_FILENAME, outputFilename, tcdFlowData->outputFile);
 
     system(command);
-
-    // free(command);
-    // free(pwd);
 }
 
-/// @brief Removes the temporary files
+/**
+ * @brief  Removes the temporary files
+ */
 void removeTemporaryFiles()
 {
     char *command = (char *)malloc(1024 * sizeof(char));
     sprintf(command, "rm %s.c %s %s %s", INTERMEDIATE_FILENAME, SCOPED_FILENAME, COLLAPSE_PARAMETERS_FILENAME, "tmp.c");
     system(command);
-    // free(command);
 }
