@@ -28,8 +28,10 @@ for subfolder in subfolders:
 df = pd.DataFrame(data, columns=['Strategy', 'test', 'Execution Time (microseconds)'])
 
 # create the report
+# use logaritmic scale on y axis
 for test_name, test in zip(test_names, tests):
     plt.figure()
+    plt.yscale('log')
     sns.boxplot(x='Strategy', y='Execution Time (microseconds)', data=df[df['test'] == test], showfliers=False, showmeans=True, meanprops={"marker":"o","markerfacecolor":"white", "markeredgecolor":"black"}, palette='Set2', hue='Strategy')
     plt.title(test_name)
     plt.savefig(os.path.join(performance_tests_dir, test_name + '.png'))
