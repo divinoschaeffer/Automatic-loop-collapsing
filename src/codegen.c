@@ -154,9 +154,9 @@ void increment(int curr_depth,
     string[fsize] = 0;
     tabString(tmpFile, string, fsize);
 
-    fs_writef("%s = %s;", name_array[curr_depth + 1], string);
-
     increment(curr_depth - 1, outer_var_bounds, name_array, stop_conditions, stop_conditions_int, initial_values, options);
+
+    fs_writef("%s = %s;", name_array[curr_depth + 1], string);
 
     fs_untabular();
     fs_writef("}");
@@ -367,7 +367,7 @@ void generateBoundaryHeader(TCD_Boundary boundary, FILE *outputFile, int boundar
                                               "To set the path, please define the environment variable TRAHRHE_INSTALL_DIR\n"
                                               "with the path to the trahrhe directory.\n"
                                               "Example: export TRAHRHE_INSTALL_DIR=/path/to/trahrhe\n";
-        fprintf(stderr, trahrhe_warning_message);
+        fprintf(stderr, "%s", trahrhe_warning_message);
         strcpy(trahrhe_install_directory, "./trahrhe");
     }
     else

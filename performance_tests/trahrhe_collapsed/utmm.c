@@ -47,12 +47,12 @@ int main()
 		if (k > i)
 		{
 			j++;
-			k = j;
 			if (j > i)
 			{
 				i++;
 				j = 0;
 			}
+			k = j;
 		}
 	}
 

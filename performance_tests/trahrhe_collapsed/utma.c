@@ -49,6 +49,7 @@ int main()
 			j = 0;
 		}
 	}
+
 	gettimeofday(&end, NULL);
 
 	time1 = start.tv_sec * 1000000 + start.tv_usec;

@@ -48,14 +48,15 @@ int main()
 		if (k > i - j)
 		{
 			j++;
-			k = 0;
 			if (j > i)
 			{
 				i++;
 				j = 0;
 			}
+			k = 0;
 		}
 	}
+
 	gettimeofday(&end, NULL);
 
 	time1 = start.tv_sec * 1000000 + start.tv_usec;
@@ -63,5 +64,6 @@ int main()
 	time3 = time2 - time1;
 
 	printf("%ld\n", time3);
+
 	return 0;
 }

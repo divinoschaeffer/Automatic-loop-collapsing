@@ -5,8 +5,7 @@ compile() {
     local file="$1"
     local filebase=$(basename $file .c)
     local filedir=$(dirname $file)
-    gcc -O3 $file -o "$filedir/$filebase" \
-        -lm -fopenmp
+    gcc -O3 -march=native -fopenmp $file -o "$filedir/$filebase" -lm
 }
 
 basic_schedule_static="omp_schedule_static";

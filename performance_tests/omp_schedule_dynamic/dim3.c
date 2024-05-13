@@ -27,7 +27,6 @@ int main()
 
 	// calcul
 	gettimeofday(&start, NULL);
-#pragma omp parallel for private(j, k) schedule(dynamic)
 	for (i = 0; i < N + 1; i++)
 		for (j = 0; j < i + 1; j++)
 			for (k = 0; k < i - j + 1; k++)
