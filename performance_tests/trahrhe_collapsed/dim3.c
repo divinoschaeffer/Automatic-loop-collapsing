@@ -6,7 +6,7 @@
 #include <sys/time.h>
 #include <stdlib.h>
 
-#define N 2000
+#define N 1800
 
 double a[N + 1][N + 1][N + 1], b[N + 1][N + 1], c[N + 1][N + 1];
 
