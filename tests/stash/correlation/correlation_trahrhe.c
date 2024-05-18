@@ -99,29 +99,30 @@ static void kernel_correlation(int m, int n,
         }
 
     /* Calculate the m * m correlation matrix. */
-    for (i = 0; i < _PB_M-1; i++)
+    for (i = 0; i < _PB_M - 1; i++)
     {
-      corr[i][i] = SCALAR_VAL(1.0);
-      for (j = i+1; j < _PB_M; j++)
+        corr[i][i] = SCALAR_VAL(1.0);
+        for (j = i + 1; j < _PB_M; j++)
         {
-          corr[i][j] = SCALAR_VAL(0.0);
+            corr[i][j] = SCALAR_VAL(0.0);
         }
-
     }
 
     polybench_start_instruments;
 
-    #pragma trahrhe collapse(2) 
-    for (i = 0; i < _PB_M-1; i++)
+#pragma trahrhe collapse(2)
+    for (i = 0; i < _PB_M - 1; i++)
     {
-      for (j = i+1; j < _PB_M; j++)
+        for (j = i + 1; j < _PB_M; j++)
         {
-          for (k = 0; k < _PB_N; k++)
-            corr[i][j] += (data[k][i] * data[k][j]);
-          corr[j][i] = corr[i][j];
+            for (k = 0; k < _PB_N; k++)
+            {
+                corr[i][j] += (data[k][i] * data[k][j]);
+            }
+            corr[j][i] = corr[i][j];
         }
     }
-    #pragma endtrahrhe
+#pragma endtrahrhe
 
     polybench_stop_instruments;
 

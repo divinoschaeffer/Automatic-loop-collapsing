@@ -15,8 +15,16 @@ sudo bash install.sh
 Then, specify the path to Trahrhe's root directory. This is the directory where the `trahrhe` binary is located. The default path is `/usr/local/bin`. If you have installed Trahrhe in a different directory, you can specify the path by running the following command:
     
 ```bash
-export TRAHRHE_INSTALL_DIR=<path_to_trahrhe>
+export TRAHRHE_INSTALL_DIR=<PATH_TO_TRAHRHE>
 ```
+
+Finally, add the utility folder to the PATH environment variable by running the following command:
+
+```bash
+export PATH=$PATH:<PATH_TO_TRAHRHE_COLLAPSE>/utility
+```
+
+To make the changes permanent, add the above commands to the `.bashrc` file.
 
 ## Uninstalling
 

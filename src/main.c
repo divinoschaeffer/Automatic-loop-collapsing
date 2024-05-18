@@ -111,7 +111,7 @@ int main(int argc, char **argv)
 
     /* Initialize */
     char *inputFilename = argv[1];
-    char *outputFilename = argc > 3 ? argv[3] : "out";
+    char *outputFilename = argc > 3 ? argv[3] : "out.c";
 
     return collapse(inputFilename, outputFilename);
 }

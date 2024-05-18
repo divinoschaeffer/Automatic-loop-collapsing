@@ -23,6 +23,14 @@ Then, specify the path to Trahrhe's root directory. This is the directory where 
 export TRAHRHE_INSTALL_DIR=<path_to_trahrhe>
 ```
 
+Finally, add the utility folder to the PATH environment variable by running the following command:
+
+```bash
+export PATH=$PATH:<PATH_TO_TRAHRHE_COLLAPSE>/utility
+```
+
+To make the changes permanent, add the above commands to the `.bashrc` file.
+
 ## Uninstalling
 
 Run 

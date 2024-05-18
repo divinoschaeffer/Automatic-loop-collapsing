@@ -6,8 +6,6 @@
 # This script is used to build the tests for the project.
 ##########################################################
 
-set -e
-
 # Set project root directory
 PROJECT_ROOT_DIR=$(pwd)
 
@@ -24,18 +22,15 @@ compile_test() {
     local test_folder="$1"
     local test_name=$(basename "$test_folder")
     local entry_point="$test_folder/${test_name}_trahrhe.c"
-    local collapsed="$test_folder/${test_name}_collapsed"
+    local collapsed="$test_folder/${test_name}_collapsed.c"
 
     gcc "$test_folder/$test_name.c" \
         -o "$TESTS_BIN_DIR/$test_name" -lm -fopenmp -DPOLYBENCH_DUMP_ARRAYS -DMINI_DATASET \
         -I "$PROJECT_ROOT_DIR/tests/utilities" "$PROJECT_ROOT_DIR/tests/utilities/polybench.c"
 
-    local binary_file="./trahrhe-collapse"
-    chmod +x ./trahrhe-collapse
-
     # get shorter path name
     entry_point=$(realpath --relative-to="$PROJECT_ROOT_DIR" "$entry_point")
-    # collapsed=$(realpath --relative-to="$PROJECT_ROOT_DIR/fusion" "$collapsed")
+    collapsed=$(realpath --relative-to="$PROJECT_ROOT_DIR" "$collapsed")
 
     # skip if entry point does not exist
     if [ ! -f "$entry_point" ]; then
@@ -43,15 +38,18 @@ compile_test() {
         return
     fi
 
-    # Check if the binary file exists
-    if [ -x "$binary_file" ]; then
-        echo "Collapsing loops for test: $test_name"
-        echo "Entry point: $entry_point"
-        echo "Collapsed: $collapsed"
-        (exec "$binary_file" "$entry_point" -o "$collapsed")
-    else
-        echo "Binary file not found or not executable."
+    echo "Collapsing loops for test: $test_name"
+    echo "Entry point: $entry_point"
+    echo "Collapsed: $collapsed"
+
+    # Run the collapse tool and capture any errors
+    trahrhe-collapse "$entry_point" "$collapsed" 2>&1 | tee collapse.log
+
+    if [ ${PIPESTATUS[0]} -ne 0 ]; then
+        echo "Error occurred during trahrhe-collapse. Check collapse.log for details."
+        exit 1
     fi
+
 
     # Check if the collapsed file exists
     if [ -f "${collapsed}.c" ]; then

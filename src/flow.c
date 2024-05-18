@@ -23,11 +23,8 @@ void initTcdFlow(char *inputFilename, char *outputFilename)
     tcdFlowData = (TCD_FlowData *)malloc(sizeof(TCD_FlowData));
 
     char *bash_command = (char *)malloc(100 * sizeof(char));
-    char *pwd = (char *)malloc(100 * sizeof(char));
 
-    getcwd(pwd, 100);
-
-    sprintf(bash_command, "%s/extractor.sh %s %s %s", pwd, inputFilename, SCOPED_FILENAME, COLLAPSE_PARAMETERS_FILENAME);
+    sprintf(bash_command, "bash trahrhe_extractor.sh %s %s %s", inputFilename, SCOPED_FILENAME, COLLAPSE_PARAMETERS_FILENAME);
     system(bash_command);
 
     tcdFlowData->entryFile = SCOPED_FILENAME;
