@@ -423,6 +423,7 @@ void generateHeaderFile(TCD_BoundaryList boundaryList)
 {
     char *headerFilename = (char *)malloc(1024 * sizeof(char));
     strcpy(headerFilename, tcdFlowData->outputFile);
+    headerFilename[strlen(headerFilename) - 2] = '\0';
     strcat(headerFilename, ".h");
     FILE *outputFile = fopen(headerFilename, "w+");
     if (outputFile == NULL)
@@ -449,7 +450,6 @@ void generateHeaderFile(TCD_BoundaryList boundaryList)
 void mergeGeneratedCode()
 {
     char *command = (char *)malloc(1024 * sizeof(char));
-    char *pwd = (char *)malloc(100 * sizeof(char));
     char *outputFilename = (char *)malloc(1024 * sizeof(char));
 
     // take only the name not the path
@@ -460,9 +460,9 @@ void mergeGeneratedCode()
         strcpy(outputFilename, token);
         token = strtok(NULL, "/");
     }
+    outputFilename[strlen(outputFilename) - 2] = '\0';
 
-    getcwd(pwd, 100);
-    sprintf(command, "%s/fusion/fusion.sh %s %s.c '#include \"%s.h\"' %s.c", pwd, tcdFlowData->entryFile, INTERMEDIATE_FILENAME, outputFilename, tcdFlowData->outputFile);
+    sprintf(command, "bash trahrhe_fusion.sh %s %s.c '#include \"%s.h\"' %s", tcdFlowData->entryFile, INTERMEDIATE_FILENAME, outputFilename, tcdFlowData->outputFile);
 
     system(command);
 }
