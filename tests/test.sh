@@ -1,13 +1,18 @@
 #!/bin/bash
 
+# Chemin vers les dossiers "cases" et "build"
+cases_path="cases"
+build_path="build"
+
+
 # Parcourir chaque sous-dossier dans le dossier "cases"
 for subfolder in "$cases_path"/*; do
     if [ -d "$subfolder" ]; then
         subfolder_name=$(basename "$subfolder")
 
         # Chemin vers les exécutables dans le dossier "build"
-        executable1_path="$build_path/$subfolder_name/$subfolder_name"
-        executable2_path="$build_path/$subfolder_name/${subfolder_name}_collapsed"
+        executable1_path="$build_path/$subfolder_name"
+        executable2_path="$build_path/${subfolder_name}_collapsed"
 
         # Vérifier si les exécutables existent
         if [ -x "$executable1_path" ] && [ -x "$executable2_path" ]; then
