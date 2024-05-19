@@ -43,7 +43,7 @@ compile_test() {
     echo "Collapsed: $collapsed"
 
     # Run the collapse tool and capture any errors
-    trahrhe-collapse "$entry_point" "$collapsed" 2>&1 | tee collapse.log
+    trahrhe-collapse "$entry_point" "$collapsed"
 
     if [ ${PIPESTATUS[0]} -ne 0 ]; then
         echo "Error occurred during trahrhe-collapse. Check collapse.log for details."
